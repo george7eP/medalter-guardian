@@ -78,7 +78,7 @@ medalter-guardian/
 | README 修订 | ✅ 已暂存 | 修正名称、版本号、新增架构/安全/API 详细文档 |
 | 代码走读 | ✅ 完成 | 三阶段深度阅读全部关键代码 |
 | 种子数据修复 | ✅ 完成 | BCrypt 哈希有效，system:log 权限已补，API URL 已修正 |
-| 权限补全 | ⬜ 待开始 | 业务 Controller 缺少 @PreAuthorize |
+| 权限补全 | ✅ 完成 | 6 个 Controller 全部添加方法级 @PreAuthorize |
 | 配置安全 | ⬜ 待开始 | JWT secret / DB 密码硬编码 |
 
 ---
@@ -88,7 +88,7 @@ medalter-guardian/
 | ID | 目标 | 优先级 | 状态 | 依赖 |
 |----|------|--------|------|------|
 | T1 | 修复 `data.sql` 种子数据（BCrypt 哈希 + 缺少 system:log） | 🔴 高 | ✅ | — |
-| T2 | 为业务 Controller 补全 `@PreAuthorize` 方法级鉴权 | 🟡 中 | ⬜ | T1 |
+| T2 | 为业务 Controller 补全 `@PreAuthorize` 方法级鉴权 | 🟡 中 | ✅ | T1 |
 | T3 | JWT secret 和 DB 密码外置到环境变量/配置文件分离 | 🟡 中 | ⬜ | — |
 | T4 | 补充 `system:log` 权限到种子数据 + 前后端映射 | 🔴 高 | ✅ | T1 |
 | T5 | 前端路由守卫补充业务页面权限绑定（device, inspect, warn） | 🟡 中 | ⬜ | T2 |
@@ -100,9 +100,8 @@ medalter-guardian/
 
 ## 已知问题
 
-1. **业务 Controller 无 `@PreAuthorize`**：`DeviceInfoController`、`InspectPlanController`、`InspectRecordController`、`WarnRuleController`、`WarnInfoController` 均未添加方法级鉴权注解，仅依赖 URL 级认证。
-2. **`application.yaml` 敏感信息硬编码**：JWT secret 和数据库密码明文存储。
-3. **README 版本滞后**：此前 README 写 Java 17 / Vite 5 / Node 18，实际为 Java 21 / Vite 8 / Node 22（已于当前暂存中修正）。
+1. **`application.yaml` 敏感信息硬编码**：JWT secret 和数据库密码明文存储。
+2. **README 版本滞后**：此前 README 写 Java 17 / Vite 5 / Node 18，实际为 Java 21 / Vite 8 / Node 22（已于当前暂存中修正）。
 
 ---
 

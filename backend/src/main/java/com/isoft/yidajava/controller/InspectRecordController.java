@@ -6,6 +6,7 @@ import com.isoft.yidajava.common.Result;
 import com.isoft.yidajava.entity.InspectRecord;
 import com.isoft.yidajava.service.InspectRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import com.isoft.yidajava.annotation.Log;
 
@@ -19,6 +20,7 @@ public class InspectRecordController {
     /**
      * 獲取檢修記錄分頁列表
      */
+    @PreAuthorize("hasAuthority('inspect:record')")
     @GetMapping
     public Result<Page<InspectRecord>> getRecordList(
             @RequestParam(value = "page", defaultValue = "1") int page,
@@ -45,6 +47,7 @@ public class InspectRecordController {
     /**
      * 新增檢修記錄
      */
+    @PreAuthorize("hasAuthority('inspect:record')")
     @Log("提交檢修記錄")
     @PostMapping
     public Result<InspectRecord> createRecord(@RequestBody InspectRecord record) {
@@ -59,6 +62,7 @@ public class InspectRecordController {
     /**
      * 修改檢修記錄
      */
+    @PreAuthorize("hasAuthority('inspect:record')")
     @Log("修改檢修記錄")
     @PutMapping("/{id}")
     public Result<InspectRecord> updateRecord(@PathVariable Long id, @RequestBody InspectRecord record) {
@@ -74,6 +78,7 @@ public class InspectRecordController {
     /**
      * 刪除檢修記錄
      */
+    @PreAuthorize("hasAuthority('inspect:record')")
     @Log("刪除檢修記錄")
     @DeleteMapping("/{id}")
     public Result<Void> deleteRecord(@PathVariable Long id) {

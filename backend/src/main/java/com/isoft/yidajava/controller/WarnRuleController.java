@@ -6,6 +6,7 @@ import com.isoft.yidajava.common.Result;
 import com.isoft.yidajava.entity.WarnRule;
 import com.isoft.yidajava.service.WarnRuleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import com.isoft.yidajava.annotation.Log;
 
@@ -19,6 +20,7 @@ public class WarnRuleController {
     /**
      * 獲取預警規則分頁列表
      */
+    @PreAuthorize("hasAuthority('warn:rule')")
     @GetMapping
     public Result<Page<WarnRule>> getRuleList(
             @RequestParam(value = "page", defaultValue = "1") int page,
@@ -48,6 +50,7 @@ public class WarnRuleController {
     /**
      * 新增預警規則
      */
+    @PreAuthorize("hasAuthority('warn:rule')")
     @Log("新增預警規則")
     @PostMapping
     public Result<WarnRule> createRule(@RequestBody WarnRule rule) {
@@ -62,6 +65,7 @@ public class WarnRuleController {
     /**
      * 修改預警規則
      */
+    @PreAuthorize("hasAuthority('warn:rule')")
     @Log("修改預警規則")
     @PutMapping("/{id}")
     public Result<WarnRule> updateRule(@PathVariable Long id, @RequestBody WarnRule rule) {
@@ -77,6 +81,7 @@ public class WarnRuleController {
     /**
      * 刪除預警規則
      */
+    @PreAuthorize("hasAuthority('warn:rule')")
     @Log("刪除預警規則")
     @DeleteMapping("/{id}")
     public Result<Void> deleteRule(@PathVariable Long id) {

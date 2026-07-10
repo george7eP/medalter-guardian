@@ -6,6 +6,7 @@ import com.isoft.yidajava.common.Result;
 import com.isoft.yidajava.entity.InspectPlan;
 import com.isoft.yidajava.service.InspectPlanService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import com.isoft.yidajava.annotation.Log;
 
@@ -19,6 +20,7 @@ public class InspectPlanController {
     /**
      * 獲取檢修計畫分頁列表
      */
+    @PreAuthorize("hasAuthority('inspect:plan')")
     @GetMapping
     public Result<Page<InspectPlan>> getPlanList(
             @RequestParam(value = "page", defaultValue = "1") int page,
@@ -44,6 +46,7 @@ public class InspectPlanController {
     /**
      * 新增檢修計畫
      */
+    @PreAuthorize("hasAuthority('inspect:plan')")
     @Log("制定檢修計畫")
     @PostMapping
     public Result<InspectPlan> createPlan(@RequestBody InspectPlan plan) {
@@ -58,6 +61,7 @@ public class InspectPlanController {
     /**
      * 修改檢修計畫
      */
+    @PreAuthorize("hasAuthority('inspect:plan')")
     @Log("修改檢修計畫")
     @PutMapping("/{id}")
     public Result<InspectPlan> updatePlan(@PathVariable Long id, @RequestBody InspectPlan plan) {
@@ -73,6 +77,7 @@ public class InspectPlanController {
     /**
      * 刪除檢修計畫
      */
+    @PreAuthorize("hasAuthority('inspect:plan')")
     @Log("刪除檢修計畫")
     @DeleteMapping("/{id}")
     public Result<Void> deletePlan(@PathVariable Long id) {
