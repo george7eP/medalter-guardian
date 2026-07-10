@@ -37,26 +37,31 @@ const router = createRouter({
         {
           path: '/device',
           name: 'device',
+          meta: { permission: 'device:list' },
           component: () => import('@/views/device/index.vue'),
         },
         {
           path: '/inspect/plan',
           name: 'inspect-plan',
+          meta: { permission: 'inspect:plan' },
           component: () => import('@/views/inspect/plan.vue'),
         },
         {
           path: '/inspect/record',
           name: 'inspect-record',
+          meta: { permission: 'inspect:record' },
           component: () => import('@/views/inspect/record.vue'),
         },
         {
           path: '/warn/rule',
           name: 'warn-rule',
+          meta: { permission: 'warn:rule' },
           component: () => import('@/views/warn/rule.vue'),
         },
         {
           path: '/warn/handle',
           name: 'warn-handle',
+          meta: { permission: 'warn:handle' },
           component: () => import('@/views/warn/handle.vue'),
         },
         {
