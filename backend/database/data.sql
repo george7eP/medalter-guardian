@@ -3,9 +3,9 @@
 -- ----------------------------
 -- 密码都是 123456 加密后
 INSERT INTO sys_user (username, password, real_name, phone, email, status) VALUES
-('admin','$2a$10$XxWn2Vh2GkQ1LzTn3Hs1eOa3Vh2GkQ1LzTn3Hs1eOa3Vh2GkQ1Lz','系统管理员','13800138000','admin@hospital.com',1),
-('tech01','$2a$10$XxWn2Vh2GkQ1LzTn3Hs1eOa3Vh2GkQ1LzTn3Hs1eOa3Vh2GkQ1Lz','维修技术员','13700137000','tech@hospital.com',1),
-('user01','$2a$10$XxWn2Vh2GkQ1LzTn3Hs1eOa3Vh2GkQ1LzTn3Hs1eOa3Vh2GkQ1Lz','普通操作员','13900139000','user@hospital.com',1);
+('admin','$2a$10$vf2hFEHJTdnm2HJo1j0pQ.jl5MHpxkk.4aoR5xvClVpn5Fs7wrS9a','系统管理员','13800138000','admin@hospital.com',1),
+('tech01','$2a$10$vf2hFEHJTdnm2HJo1j0pQ.jl5MHpxkk.4aoR5xvClVpn5Fs7wrS9a','维修技术员','13700137000','tech@hospital.com',1),
+('user01','$2a$10$vf2hFEHJTdnm2HJo1j0pQ.jl5MHpxkk.4aoR5xvClVpn5Fs7wrS9a','普通操作员','13900139000','user@hospital.com',1);
 
 INSERT INTO sys_role (role_code, role_name, remark) VALUES
 ('ROLE_ADMIN','超级管理员','拥有全部权限'),
@@ -13,16 +13,17 @@ INSERT INTO sys_role (role_code, role_name, remark) VALUES
 ('ROLE_USER','普通操作员','仅查看数据');
 
 INSERT INTO sys_permission (perm_code, perm_name, perm_type, parent_id, path, api_url, sort) VALUES
-('device:list','设备列表查询','API',0,NULL,'/device/list',1),
-('device:add','设备新增','API',0,NULL,'/device/add',2),
-('device:edit','设备修改','API',0,NULL,'/device/edit',3),
-('device:delete','设备删除','API',0,NULL,'/device/delete',4),
+('device:list','设备列表查询','API',0,NULL,'/device/**',1),
+('device:add','设备新增','API',0,NULL,'/device/**',2),
+('device:edit','设备修改','API',0,NULL,'/device/**',3),
+('device:delete','设备删除','API',0,NULL,'/device/**',4),
 ('inspect:plan','检修计划管理','API',0,NULL,'/inspect/plan/**',5),
 ('inspect:record','检修记录管理','API',0,NULL,'/inspect/record/**',6),
 ('warn:rule','预警规则配置','API',0,NULL,'/warn/rule/**',7),
-('warn:handle','预警信息处理','API',0,NULL,'/warn/handle/**',8),
-('system:user','用户管理','API',0,NULL,'/system/user/**',9),
-('system:role','角色管理','API',0,NULL,'/system/role/**',10);
+('warn:handle','预警信息处理','API',0,NULL,'/warn/info/**',8),
+('system:user','用户管理','API',0,NULL,'/user/**',9),
+('system:role','角色管理','API',0,NULL,'/role/**',10),
+('system:log','操作日志','API',0,NULL,'/system/log/**',11);
 
 -- 用户-角色
 INSERT INTO sys_user_role (user_id, role_id) VALUES
@@ -33,7 +34,7 @@ INSERT INTO sys_user_role (user_id, role_id) VALUES
 -- 角色-权限
 INSERT INTO sys_role_permission (role_id, perm_id) VALUES
 -- 管理员全部权限
-(1,1),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(1,8),(1,9),(1,10),
+(1,1),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(1,8),(1,9),(1,10),(1,11),
 -- 技术员权限
 (2,1),(2,5),(2,6),(2,8),
 -- 普通用户仅查看

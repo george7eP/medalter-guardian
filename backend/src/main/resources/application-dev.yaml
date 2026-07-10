@@ -1,0 +1,11 @@
+# ============================================================
+# 开发环境配置 (Development Profile)
+# 本地开发时自动激活，开箱即用
+# ============================================================
+spring:
+  datasource:
+    username: root
+    password: 123456
+
+jwt:
+  secret: dev-secret-key-2026-medical-device-management-system

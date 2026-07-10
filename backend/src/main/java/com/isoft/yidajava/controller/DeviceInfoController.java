@@ -6,6 +6,7 @@ import com.isoft.yidajava.common.Result;
 import com.isoft.yidajava.entity.DeviceInfo;
 import com.isoft.yidajava.service.DeviceInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import com.isoft.yidajava.annotation.Log;
 
@@ -19,6 +20,7 @@ public class DeviceInfoController {
     /**
      * 獲取設備分頁列表
      */
+    @PreAuthorize("hasAuthority('device:list')")
     @GetMapping
     public Result<Page<DeviceInfo>> getDeviceList(
             @RequestParam(value = "page", defaultValue = "1") int page,
@@ -46,6 +48,7 @@ public class DeviceInfoController {
     /**
      * 新增設備
      */
+    @PreAuthorize("hasAuthority('device:add')")
     @Log("新增醫療設備")
     @PostMapping
     public Result<DeviceInfo> createDevice(@RequestBody DeviceInfo deviceInfo) {
@@ -60,6 +63,7 @@ public class DeviceInfoController {
     /**
      * 修改設備資訊
      */
+    @PreAuthorize("hasAuthority('device:edit')")
     @Log("修改設備資訊")
     @PutMapping("/{id}")
     public Result<DeviceInfo> updateDevice(@PathVariable Long id, @RequestBody DeviceInfo deviceInfo) {
@@ -79,6 +83,7 @@ public class DeviceInfoController {
     /**
      * 刪除設備
      */
+    @PreAuthorize("hasAuthority('device:delete')")
     @Log("刪除醫療設備")
     @DeleteMapping("/{id}")
     public Result<Void> deleteDevice(@PathVariable Long id) {

@@ -6,6 +6,7 @@ import com.isoft.yidajava.common.Result;
 import com.isoft.yidajava.entity.WarnInfo;
 import com.isoft.yidajava.service.WarnInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import com.isoft.yidajava.annotation.Log;
 import java.time.LocalDateTime;
@@ -20,6 +21,7 @@ public class WarnInfoController {
     /**
      * 獲取預警資訊分頁列表
      */
+    @PreAuthorize("hasAuthority('warn:handle')")
     @GetMapping
     public Result<Page<WarnInfo>> getWarnList(
             @RequestParam(value = "page", defaultValue = "1") int page,
@@ -50,6 +52,7 @@ public class WarnInfoController {
     /**
      * 處理預警資訊
      */
+    @PreAuthorize("hasAuthority('warn:handle')")
     @Log("處理設備預警")
     @PutMapping("/handle/{id}")
     public Result<WarnInfo> handleWarn(@PathVariable Long id, @RequestBody WarnInfo warnInfo) {
@@ -75,6 +78,7 @@ public class WarnInfoController {
     /**
      * 刪除預警記錄
      */
+    @PreAuthorize("hasAuthority('warn:handle')")
     @Log("刪除預警記錄")
     @DeleteMapping("/{id}")
     public Result<Void> deleteWarn(@PathVariable Long id) {

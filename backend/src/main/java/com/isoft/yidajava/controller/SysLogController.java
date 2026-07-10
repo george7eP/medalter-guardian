@@ -1,18 +1,22 @@
 package com.isoft.yidajava.controller;
+
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.isoft.yidajava.common.Result;
 import com.isoft.yidajava.entity.SysLog;
 import com.isoft.yidajava.service.SysLogService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/system/log")
 public class SysLogController {
+
     @Autowired
     private SysLogService sysLogService;
 
+    @PreAuthorize("hasAuthority('system:log')")
     @GetMapping
     public Result<Page<SysLog>> getLogList(
             @RequestParam(defaultValue = "1") int page,
