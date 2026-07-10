@@ -96,7 +96,7 @@ medalter-guardian/
 | T4 | 补充 `system:log` 权限到种子数据 + 前后端映射 | 🔴 高 | ✅ | T1 |
 | T5 | 前端路由守卫补充业务页面权限绑定（device, inspect, warn） | 🟡 中 | ✅ | T2 |
 | T6 | CORS 配置收紧（生产环境限制具体 Origin） | 🟢 低 | ✅ | — |
-| T7 | 补充单元测试与集成测试 | 🟢 低 | 🔄 | — |
+| T7 | 补充单元测试与集成测试 | 🟢 低 | ✅ | — |
 | T9 | `SysRoleController` 补全方法级 `@PreAuthorize`（复查发现的提权隐患） | 🔴 高 | ✅ | T2 |
 | T8 | README.md 中版本号与实际 pom.xml / package.json / engines 持续同步 | 🟢 低 | ✅ | — |
 
@@ -104,9 +104,8 @@ medalter-guardian/
 
 ## 已知问题
 
-- **T7（增强）**：安全与鉴权层测试已成体系（共 **68 测试全绿**）：`JwtUtilTest`（5）、`UserDetailsServiceImplTest`（6，纯 Mockito 分支覆盖）、9 个 Controller 方法级鉴权切片（53）、`AuthControllerTest`（3，穿过安全过滤链的登录流程）。仅余基于真实 DB 的 `@SpringBootTest` 集成测试待补（需 MySQL / Testcontainers / H2 基建决策）。
-- 其余 T1–T6、T8、T9 已完成，原有安全隐患（含复查新发现的 `SysRoleController` 提权隐患）均已解决。
-- **🟡 JwtUtilTest#validateToken_rejectsTampered 偶发失败**：篡改逻辑翻转 JWT 的最后一个字符，但 Base64url 编码的签名段末尾字符可能携带未使用的低位 — 相邻字符（如 `a`↔`b`）解码为同一签名字节，令牌仍有效。概率性失败，与运行时机器的毫秒级时间戳相关。修复方向：应篡改签名字符串**首位**字符（始终携带有效位位，保证签名失效）；或固定时针（mock `System.currentTimeMillis()`）。不影响其它测试，暂缓修复。
+- **🟡 `JwtUtilTest#validateToken_rejectsTampered` 偶发失败**：篡改逻辑翻转 JWT 最后一个字符，但 Base64url 签名段末尾字符的未使用低位使相邻字符解码为同一签名字节，令牌仍有效（概率性与时间戳相关）。修复方向：篡改签名**首位**字符，或 mock 时钟。不影响其它测试，暂缓。
+- **DB 集成测试待补**：当前 68 测试均为纯 Mockito / `@WebMvcTest` 切片，无需数据库。仅在确定 MySQL / Testcontainers / H2 基建方案后，才有必要补 `@SpringBootTest` 集成测试。T1–T6、T8、T9 全部完成。
 
 ---
 
