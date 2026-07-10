@@ -100,7 +100,7 @@ medalter-guardian/
 
 ## 已知问题
 
-1. **README 版本滞后**：此前 README 写 Java 17 / Vite 5 / Node 18，实际为 Java 21 / Vite 8 / Node 22（已于当前暂存中修正）。
+（T1–T6 已全部修复，原 6 项已知问题均已解决，剩余为增强性任务 T7/T8。）
 
 ---
 
