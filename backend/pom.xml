@@ -9,10 +9,10 @@
         <relativePath/>
     </parent>
     <groupId>com.isoft</groupId>
-    <artifactId>yidajava</artifactId>
+    <artifactId>medalterguardian</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>yidajava</name>
-    <description>yidajava</description>
+    <name>medalterguardian</name>
+    <description>medalterguardian</description>
 
     <properties>
         <java.version>21</java.version>
