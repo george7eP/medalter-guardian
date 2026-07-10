@@ -75,7 +75,7 @@ medalter-guardian/
 | 阶段 | 状态 | 说明 |
 |------|------|------|
 | 项目初始化 | ✅ 完成 | Git init, GitHub push, 初始提交 |
-| README 修订 | ✅ 已暂存 | 修正名称、版本号、新增架构/安全/API 详细文档 |
+| README 修订 | ✅ 完成 | 修正名称、版本号、新增架构/安全/API 详细文档（已合入 master） |
 | 代码走读 | ✅ 完成 | 三阶段深度阅读全部关键代码 |
 | 种子数据修复 | ✅ 完成 | BCrypt 哈希有效，system:log 权限已补，API URL 已修正 |
 | 权限补全 | ✅ 完成 | 6 个 Controller 全部添加方法级 @PreAuthorize |
@@ -94,13 +94,13 @@ medalter-guardian/
 | T5 | 前端路由守卫补充业务页面权限绑定（device, inspect, warn） | 🟡 中 | ✅ | T2 |
 | T6 | CORS 配置收紧（生产环境限制具体 Origin） | 🟢 低 | ✅ | — |
 | T7 | 补充单元测试与集成测试 | 🟢 低 | ⬜ | — |
-| T8 | README.md 中版本号与实际 pom.xml / package.json / engines 持续同步 | 🟢 低 | ⬜ | — |
+| T8 | README.md 中版本号与实际 pom.xml / package.json / engines 持续同步 | 🟢 低 | ✅ | — |
 
 ---
 
 ## 已知问题
 
-（T1–T6 已全部修复，原 6 项已知问题均已解决，剩余为增强性任务 T7/T8。）
+（T1–T6 + T8 已完成，原 6 项已知问题均已解决。仅剩增强性任务 T7：单元测试与集成测试。）
 
 ---
 
