@@ -92,7 +92,7 @@ medalter-guardian/
 | T3 | JWT secret 和 DB 密码外置到环境变量/配置文件分离 | 🟡 中 | ✅ | — |
 | T4 | 补充 `system:log` 权限到种子数据 + 前后端映射 | 🔴 高 | ✅ | T1 |
 | T5 | 前端路由守卫补充业务页面权限绑定（device, inspect, warn） | 🟡 中 | ✅ | T2 |
-| T6 | CORS 配置收紧（生产环境限制具体 Origin） | 🟢 低 | ⬜ | — |
+| T6 | CORS 配置收紧（生产环境限制具体 Origin） | 🟢 低 | ✅ | — |
 | T7 | 补充单元测试与集成测试 | 🟢 低 | ⬜ | — |
 | T8 | README.md 中版本号与实际 pom.xml / package.json / engines 持续同步 | 🟢 低 | ⬜ | — |
 
