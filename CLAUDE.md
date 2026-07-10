@@ -112,53 +112,11 @@ medalter-guardian/
 
 当收到"收工 / 功能跑通 / 完成修复 / 准备提交"指令时，严格执行以下三阶段自动化闭环：
 
----
+1. **第一阶段**：Push → 自动生成 PR 文档 → 提示用户创建 PR 并 Merge
+2. **第二阶段**：验证云端分支状态 → 切回 `master` → `git pull` → `git branch -d`
+3. **第三阶段**：Stash 审计，区分废弃草稿（drop）和主干草稿（pop）
 
-### 🌐 第一阶段：代码上云与 PR 报告生成
-
-**Step 1 — Push**：自动将当前本地临时分支（如 `fix/*` 或 `feat/*`）推送到远程 GitHub：
-```bash
-git push -u origin HEAD
-```
-
-**Step 2 — 智能生成 PR 文档**：推送成功后，根据本次代码的 `git diff` 变动，在终端自动输出结构化 GitHub PR Description（Markdown），内容必须包含：
-- **📝 概述 (What & Why)**：本次修改的核心原因和背景
-- **🛠️ 详细改动清单 (Changes)**：具体动了哪些文件和逻辑
-- **🧪 测试验证情况 (Testing)**：功能是如何测通的
-
-**Step 3 — 卡点提示**：明确提示用户前往 GitHub 创建 PR 并确认 Merge，等待用户告知云端合并完成。
-
----
-
-### 💻 第二阶段：本地清理与对齐
-
-用户确认云端已 Merge 后执行：
-
-1. **验证云端分支状态**：检查远程分支是否仍存在：
-   ```bash
-   git ls-remote --heads origin <分支名>
-   ```
-   - **若仍存在**：帮助用户删除云端分支 `git push origin --delete <分支名>`，然后继续
-   - **若已删除**：直接继续本地流程
-
-2. **切回主干**：`git checkout master`
-
-3. **拉取最新**：`git pull origin master`
-
-4. **安全删除本地分支**：`git branch -d <临时分支名>`
-
----
-
-### 🧹 第三阶段：Stash 智能审计与清理
-
-本地分支删除后，运行 `git stash list` 检查残留：
-
-- **若无残留**：流程结束。
-
-- **若有残留**：逐条展示 `stash@{X}` 的备注信息（`git stash list`），并区分处理：
-  - **属于已删除临时分支的草稿**（备注含分支名或明显关联）→ 询问用户是否 `git stash drop stash@{X}` 彻底清除
-  - **属于当前主干的独立工作草稿**（如 master 上暂存的未完成修改）→ 提示用户："该草稿属于当前主干的工作副本，是否需要 `git stash pop stash@{X}` 还原到工作区？"
-  - **无法判断归属** → 列出 `stash@{X}` 并询问用户意图
+（详细步骤已写入 Claude 全局记忆，所有项目统一适用。）
 
 ---
 
