@@ -1,13 +1,16 @@
 server:
   port: 9999
+
 spring:
   application:
     name: yidajava
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/medical_device?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
-    username: root
-    password: 123456
+    url: ${DB_URL:jdbc:mysql://localhost:3306/medical_device?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD}
 
 # MyBatis-Plus 配置
 mybatis-plus:
@@ -35,7 +38,7 @@ mybatis-plus:
       update-strategy: NOT_NULL
 
 jwt:
-  secret: yidajava-secret-key-2026-medical-device-management-system
+  secret: ${JWT_SECRET}
   expiration: 86400000
   header: Authorization
   prefix: "Bearer "

@@ -79,7 +79,7 @@ medalter-guardian/
 | 代码走读 | ✅ 完成 | 三阶段深度阅读全部关键代码 |
 | 种子数据修复 | ✅ 完成 | BCrypt 哈希有效，system:log 权限已补，API URL 已修正 |
 | 权限补全 | ✅ 完成 | 6 个 Controller 全部添加方法级 @PreAuthorize |
-| 配置安全 | ⬜ 待开始 | JWT secret / DB 密码硬编码 |
+| 配置安全 | ✅ 完成 | 敏感值改为 ${ENV_VAR} + dev profile 提供默认值 |
 
 ---
 
@@ -89,7 +89,7 @@ medalter-guardian/
 |----|------|--------|------|------|
 | T1 | 修复 `data.sql` 种子数据（BCrypt 哈希 + 缺少 system:log） | 🔴 高 | ✅ | — |
 | T2 | 为业务 Controller 补全 `@PreAuthorize` 方法级鉴权 | 🟡 中 | ✅ | T1 |
-| T3 | JWT secret 和 DB 密码外置到环境变量/配置文件分离 | 🟡 中 | ⬜ | — |
+| T3 | JWT secret 和 DB 密码外置到环境变量/配置文件分离 | 🟡 中 | ✅ | — |
 | T4 | 补充 `system:log` 权限到种子数据 + 前后端映射 | 🔴 高 | ✅ | T1 |
 | T5 | 前端路由守卫补充业务页面权限绑定（device, inspect, warn） | 🟡 中 | ⬜ | T2 |
 | T6 | CORS 配置收紧（生产环境限制具体 Origin） | 🟢 低 | ⬜ | — |
@@ -100,8 +100,7 @@ medalter-guardian/
 
 ## 已知问题
 
-1. **`application.yaml` 敏感信息硬编码**：JWT secret 和数据库密码明文存储。
-2. **README 版本滞后**：此前 README 写 Java 17 / Vite 5 / Node 18，实际为 Java 21 / Vite 8 / Node 22（已于当前暂存中修正）。
+1. **README 版本滞后**：此前 README 写 Java 17 / Vite 5 / Node 18，实际为 Java 21 / Vite 8 / Node 22（已于当前暂存中修正）。
 
 ---
 
