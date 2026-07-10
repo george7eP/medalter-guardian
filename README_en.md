@@ -1,4 +1,4 @@
-# 🛠️ Equipment Maintenance and Early Warning System
+# 🏥 Medical Device Maintenance and Early Warning System
 
 <p align="center">
   <a href="./README.md">中文</a> | <b>English</b>
@@ -7,94 +7,296 @@
 ---
 
 ## 📖 Project Introduction
-This project is a digital management platform custom-built for modern enterprise equipment operation and maintenance (O&M) scenarios. Addressing common pain points in traditional industrial equipment O&M—such as cumbersome paper records, inefficient offline scheduling, opaque equipment statuses, and high rates of sudden breakdowns—the platform leverages a mainstream decoupled front-end and back-end technology stack to achieve core capabilities like digital equipment ledger management, automated maintenance workflows, intelligent fault early warnings, and comprehensive operational log traceability.
 
-By replacing traditional manual O&M models with standardized, process-driven, and intelligent management, the system effectively enhances equipment utilization, reduces the risk of unexpected failures, and implements precise, regulated control over the entire O&M lifecycle.
+This project is a digital management platform purpose-built for medical equipment operation and maintenance (O&M) scenarios in healthcare institutions. Addressing common pain points — cumbersome paper records, inefficient offline scheduling, opaque equipment statuses, and high rates of unexpected breakdowns — the platform leverages a fully decoupled front-end and back-end architecture to deliver core capabilities including digital equipment ledger management, automated maintenance workflows, intelligent fault early warnings, and full-process operational audit logging.
+
+Built around three security pillars — RBAC fine-grained authorization, JWT stateless authentication, and AOP-driven automatic auditing — the system provides a standardized, process-driven, and fully traceable solution for medical equipment O&M.
 
 ---
 
 ## 🎯 Requirements Analysis
 
 ### 1. Business Pain Points
-* **Opaque Status**: Equipment status information is not transparent, making it impossible to grasp operation and maintenance conditions in real time.
-* **Low Scheduling Efficiency**: Manual scheduling is inefficient, causing maintenance tasks to be easily missed and posing risks of overdue servicing.
-* **Poor Retrievability & Traceability**: Traditional paper records are difficult to retain, resulting in a heavy manual auditing workload and substandard traceability.
+
+- **Opaque Status**: Equipment status information is fragmented, making real-time monitoring of equipment health and maintenance conditions difficult.
+- **Low Scheduling Efficiency**: Manual scheduling is prone to omissions with high overdue risk and no automated reminders.
+- **Poor Traceability**: Paper-based records are hard to retain; manual auditing is labor-intensive and lacks reliable traceability.
 
 ### 2. Core Functional Objectives
-* **Fine-grained Authorization**: Build a three-tier subdivision management and control system (User, Role, Permission) based on the RBAC permission model to achieve fine-grained access control.
-* **Full-business Closed-loop Management**: Cover the entire lifecycle including equipment warehousing, ledger maintenance, maintenance plan generation, execution logging, and early warning processing, forming a complete data closed loop.
-* **Full-process Security Auditing**: Automatically record system core operational logs leveraging AOP (Aspect-Oriented Programming) technology, ensuring all O&M actions are searchable and traceable.
+
+- **Fine-grained Authorization**: Implements a three-tier RBAC model (User → Role → Permission) with dual protection at both the frontend routing and backend API levels.
+- **Full-business Closed-loop**: Covers equipment onboarding, ledger management, maintenance plan generation, execution recording, and fault warning processing end to end.
+- **Full-process Auditing**: Leverages AOP aspect technology to automatically capture all core operational logs — operator identity, IP address, latency, and parameters — for complete traceability.
 
 ### 3. Non-functional Requirements
-* **Data Security**: User passwords are encrypted and stored using BCrypt one-way hashing to eliminate the risk of plaintext leaks.
-* **API Security**: Implement stateless identity authentication based on JWT to guarantee the legitimacy of API access.
-* **System Performance**: Ensure high availability and low latency of APIs to handle high-frequency daily O&M operations in an enterprise environment.
+
+- **Data Security**: User passwords stored with BCrypt one-way hashing.
+- **API Security**: Stateless authentication via JWT (JJWT 0.12.x).
+- **System Performance**: MyBatis-Plus pagination plugin + MySQL 8.0 ensures responsive queries under high-frequency O&M workloads.
 
 ---
 
-## 💻 Environment & Tech Stack
+## 💻 Tech Stack
 
-### 1. Backend Tech Stack
-* **Core Language**: Java 17
-* **Framework**: Spring Boot 3.2
-* **Database**: MySQL 8.0
-* **Cache (Optional)**: Redis
-* **Build Tool**: Maven
+### Backend
 
-### 2. Frontend Tech Stack
-* **Runtime**: Node.js 18.x
-* **Core Framework**: Vue 3.4 (Composition API)
-* **Build Tool**: Vite 5.0
-* **State Management**: Pinia
-* **HTTP Client**: Axios
-* **UI Library**: Element Plus
+| Component | Version | Notes |
+|-----------|---------|-------|
+| Java | **21** | Core language |
+| Spring Boot | **3.2.6** | Application framework |
+| Spring Security | 3.2.6 (bundled) | Authentication & authorization |
+| MyBatis-Plus | **3.5.6** | ORM (spring-boot3-starter) |
+| JJWT | **0.12.6** | JWT tokens (api / impl / jackson modules) |
+| MySQL | **8.0** | Relational database |
+| Maven | 3.x | Build tool (Alibaba Cloud mirror) |
+| Lombok | **1.18.40** | Boilerplate reduction |
 
-### 3. Tools & OS
-* **Backend Development**: IntelliJ IDEA
-* **Frontend Development**: VS Code
-* **Target OS**: Windows 11 / macOS
+### Frontend
 
----
+| Component | Version | Notes |
+|-----------|---------|-------|
+| Node.js | **^20.19.0 \|\| >=22.12.0** | Runtime |
+| Vue | **3.5** (Composition API) | Core framework |
+| Vite | **8.0** | Build tool |
+| TypeScript | **6.0** | Type safety |
+| vue-router | **5.0** | Client-side routing |
+| Pinia | **3.0** | State management |
+| Axios | **1.16** | HTTP client |
+| Element Plus | **2.14** | UI component library |
 
-## 🛠️ Project Design
+### Development Tools
 
-### 1. Overall Design Concept
-This project adopts a decoupled front-end and back-end architecture, with high security, high maintainability, and low coupling as core design principles to build a standardized equipment O&M management platform.
-* **Technical Architecture**: The backend delivers standardized RESTful APIs built on Spring Boot 3, while the frontend provides a lightweight, highly interactive user interface via Vue 3 + Element Plus. The layers communicate exclusively through data interfaces, achieving complete decoupling.
-* **Authorization Design**: Based on the RBAC role-permission model, users, roles, and permissions are associated within the database to achieve dual fine-grained access control over both frontend routing and backend APIs.
-* **Security & Defense**: Integrate Spring Security + JWT for stateless login authentication; utilize BCrypt to encrypt and store user passwords; apply AOP aspect programming to automatically capture and audit global operation logs, ensuring end-to-end traceability.
-* **Development Strategy**: Adopt modular development by breaking down system businesses into independent functional modules, reducing code coupling while improving scalability and maintainability.
-
-### 2. Core Modules
-
-#### 🔐 User & Permission Module
-The fundamental security line of the system. It supports user login, logout, password modification, role assignment, and permission directive control. Through fine-grained permission configuration, it differentiates the operational privileges of various O&M personnel to ensure secure access.
-
-#### 📋 Equipment Information Management Module
-The foundational data module of the system, offering full CRUD management for the equipment ledger. It supports precise searches based on criteria such as equipment name and running status, permanently retaining comprehensive baseline profiles for all assets.
-
-#### 🔧 Maintenance Management Module
-A core business module divided into two sub-features: maintenance scheduling and result entry. It enables O&M personnel to formulate periodic maintenance plans and log execution results, realizing closed-loop workflow management from planning to execution and eliminating the issue of overdue maintenance.
-
-#### ⚠️ Early-Warning Information Module
-The core safety assurance module. It supports the dynamic configuration of fault warning rules and monitors abnormal equipment statuses in real time. It offers operations such as confirmation, handling, and dismissal for triggered warnings, allowing prompt troubleshooting of hidden dangers and reducing the risk of sudden downtime.
-
-#### 📊 System Audit Module
-Leveraging AOP technology, this module automatically collects system operation data to accurately log details such as operator, IP address, operation time, request latency, and action content. It automatically generates O&M logs to meet corporate auditing and troubleshooting requirements.
+- Backend: IntelliJ IDEA
+- Frontend: VS Code
+- Target OS: Windows 11 / macOS
 
 ---
 
-## 📁 Architecture Layers
-* **Top Layer**: Equipment Maintenance and Early Warning System (Overall Business Platform)
-* **Core Security Layer**: JWT Authentication, Permission Interceptors, AOP Logging
-* **Data Persistence Layer**: MySQL + MyBatis-Plus Data Persistence
-* **Business Functional Layer**: Equipment Ledger System, Maintenance Workflow, Early Warning Monitoring Center, System Management
+## 🛠️ Architecture Design
+
+### System Architecture
+
+```
+┌─────────────────────────────────────────────────────┐
+│                   Browser / Nginx                    │
+├────────────────────┬────────────────────────────────┤
+│   Frontend :5173   │      Backend :9999              │
+│   Vue 3 + Vite     │      Spring Boot 3              │
+│                    │                                 │
+│   axios ──REST─────▶  Controllers (10)               │
+│   Bearer Token     │      │                          │
+│                    │   Services (9 interfaces/impls) │
+│   Route Guards      │      │                          │
+│   Dynamic Menu      │   Mappers (10, zero XML)        │
+│                    │      │                          │
+│                    │   MySQL 8.0 (medical_device)    │
+│                    │                                 │
+│                    │   Security Layer:                │
+│                    │   JwtAuthFilter → SecurityConfig │
+│                    │   @Log AOP → SysLog Audit        │
+└────────────────────┴────────────────────────────────┘
+```
+
+### Backend Package Structure
+
+```
+src/main/java/com/isoft/yidajava/
+├── annotation/     # @Log custom audit annotation
+├── aspect/         # LogAspect around-advice aspect
+├── common/         # Result unified response, LoginRequest/Response DTOs
+├── config/         # SecurityConfig, JwtAuthFilter, MybatisPlusConfig, MyMetaObjectHandler
+├── controller/     # REST controllers (10)
+├── dao/            # MyBatis-Plus mappers (10, zero XML)
+├── entity/         # Database entity mappings (11: RBAC 5 + business 5 + SysLog)
+├── service/        # Business interfaces (9)
+├── service/impl/   # Business implementations (10, including UserDetailsServiceImpl)
+└── util/           # JwtUtil, PasswordGenerator
+```
+
+### Frontend Directory Structure
+
+```
+frontend/src/
+├── api/                  # API layer (by module, aligned with backend controllers)
+│   ├── device/index.ts   # Device CRUD APIs
+│   ├── inspect/          # plan.ts + record.ts
+│   ├── system/           # log.ts + role.ts
+│   ├── user/index.ts     # Login + user CRUD + role assignment
+│   └── warn/             # handle.ts + rule.ts
+├── components/layout/    # top.vue (header) + leftside.vue (dynamic menu)
+├── router/index.ts       # Route definitions + beforeEach permission guard
+├── stores/users.ts       # Pinia user store (token / permissions / userInfo)
+├── util/request.ts       # Axios wrapper (JWT interceptor + unified error handling)
+└── views/                # Page views (by business module)
+    ├── device/index.vue
+    ├── inspect/{plan,record}.vue
+    ├── system/{log,role}.vue
+    ├── user/{login,profile,userlist}.vue
+    ├── warn/{handle,rule}.vue
+    └── main.vue
+```
+
+---
+
+## 📁 Database Design (9 Tables)
+
+### RBAC Authorization (5 Tables)
+
+| Table | Description | Key Columns |
+|-------|-------------|-------------|
+| `sys_user` | System users | username, password(BCrypt), status(0/1) |
+| `sys_role` | Roles | role_code, role_name |
+| `sys_permission` | Permissions | perm_code, perm_type(MENU/BUTTON/API), path, api_url |
+| `sys_user_role` | User-role mapping | user_id ⟷ role_id (many-to-many) |
+| `sys_role_permission` | Role-permission mapping | role_id ⟷ perm_id (many-to-many) |
+
+### Business Domain (4 Tables)
+
+| Table | Description | Key Columns |
+|-------|-------------|-------------|
+| `device_info` | Medical device ledger | device_status(NORMAL/WARN/FAULT), inspect_cycle, warn_days |
+| `inspect_plan` | Maintenance plans | plan_status(PENDING/COMPLETED), plan_date, principal |
+| `inspect_record` | Maintenance records | inspect_result(PASS/PARTIAL/FAIL), operator |
+| `warn_rule` | Warning rules | warn_condition, warn_level, rule_status |
+| `warn_info` | Warning notifications | handle_status(UNHANDLED/PROCESSED/IGNORED), handle_user |
+
+### Audit (1 Table)
+
+| Table | Description | Key Columns |
+|-------|-------------|-------------|
+| `sys_log` | AOP operational audit log | username, operation, method, params, time, ip |
+
+---
+
+## 🔐 Security Design
+
+### Three-Layer Protection
+
+```
+Layer 1 ─ Frontend Route Guards
+  router.beforeEach → checks to.meta.permission
+  leftside.vue → filterMenuByPermission() dynamic menu filtering
+  userStore.hasPermission() → client-side permission check
+
+Layer 2 ─ Backend URL-Level Authentication
+  SecurityConfig:
+    ├─ /auth/** public (login/logout)
+    ├─ OPTIONS /** public (CORS preflight)
+    └─ All others → JwtAuthFilter token validation → SecurityContext
+
+Layer 3 ─ Backend Method-Level Authorization
+  @PreAuthorize("hasAuthority('system:user')") → User management
+  @PreAuthorize("hasAuthority('system:role')") → Role management
+```
+
+### JWT Authentication Flow
+
+1. User enters credentials in `login.vue` → `POST /auth/login`
+2. `AuthController` → `AuthenticationManager.authenticate()` → `UserDetailsServiceImpl.loadUserByUsername()`
+3. `SysPermissionMapper.getPermissionsByUserId()` performs a 3-table JOIN to fetch all user permissions
+4. `JwtUtil.generateToken()` creates a token (with userId and realName claims, 24h expiry)
+5. Frontend `userStore.login()` stores token + permissions in Pinia + localStorage
+6. All subsequent requests automatically attach `Authorization: Bearer <token>` via `request.ts` interceptor
+7. `JwtAuthenticationFilter` parses the token and sets the `SecurityContext`
+
+### Permission Query (the only hand-written SQL in the project)
+
+```sql
+SELECT DISTINCT p.*
+FROM sys_permission p
+INNER JOIN sys_role_permission rp ON p.id = rp.perm_id
+INNER JOIN sys_user_role ur ON rp.role_id = ur.role_id
+WHERE ur.user_id = #{userId}
+ORDER BY p.sort ASC
+```
+
+---
+
+## 📊 AOP Audit Mechanism
+
+### Implementation
+
+- Custom `@Log("operation description")` annotation placed on Controller methods
+- `LogAspect` around-advice (`@Around`) intercepts all `@Log`-annotated methods
+- Dual-fallback operator resolution: SecurityContext (authenticated ops) → LoginRequest parameter extraction (login ops)
+
+### Recorded Fields
+
+| Field | Source |
+|-------|--------|
+| username | SecurityContext / LoginRequest fallback |
+| operation | `@Log` annotation value |
+| method | `ClassName.methodName()` |
+| params | `Arrays.toString(arguments)` |
+| time | Execution time (ms) |
+| ip | `request.getRemoteAddr()` |
+
+### Audited Operations (19 @Log annotations)
+
+Login/logout, user CRUD, password changes, role assignments, device CRUD, maintenance plans/records, warning rules/handling — covering all write operations.
+
+---
+
+## 🔗 API Endpoints
+
+| Method | Path | Description | Auth Required |
+|--------|------|-------------|---------------|
+| POST | `/auth/login` | User login | Public |
+| POST | `/auth/logout` | User logout | Authenticated |
+| GET/POST/PUT/DELETE | `/user/**` | User management | `system:user` |
+| PUT | `/user/password` | Change password | Authenticated |
+| GET | `/user/info` | Current user info | Authenticated |
+| GET/POST/PUT/DELETE | `/role/**` | Role management | Authenticated |
+| GET/POST/PUT/DELETE | `/device/**` | Device management | Authenticated |
+| GET/POST/PUT/DELETE | `/inspect/plan/**` | Maintenance plans | Authenticated |
+| GET/POST/PUT/DELETE | `/inspect/record/**` | Maintenance records | Authenticated |
+| GET/POST/PUT/DELETE | `/warn/rule/**` | Warning rules | Authenticated |
+| GET/PUT/DELETE | `/warn/info/**` | Warning handling | Authenticated |
+| GET | `/system/log/**` | Operation logs | Authenticated |
+
+---
+
+## 🚀 Quick Start
+
+### 1. Database Initialization
+
+```bash
+mysql -u root -p < backend/database/schema.sql
+mysql -u root -p < backend/database/data.sql
+```
+
+### 2. Backend
+
+```bash
+cd backend
+./mvnw spring-boot:run
+# Server starts at http://localhost:9999
+```
+
+### 3. Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+# Dev server starts at http://localhost:5173
+```
+
+### 4. Test Accounts
+
+| Username | Password | Role |
+|----------|----------|------|
+| admin | 123456 | Super Admin (all permissions) |
+| tech01 | 123456 | Technician (device, inspection, warning) |
+| user01 | 123456 | Operator (device view only) |
 
 ---
 
 ## ✅ Project Highlights
-* Decoupled frontend and backend architecture ensures separated codebases, facilitating smooth iterative maintenance and secondary development.
-* Fine-grained RBAC permission control perfectly accommodates O&M management scenarios with diverse roles and positions.
-* Dual security protection combining stateless JWT authentication and BCrypt password encryption.
-* Automated log auditing powered by AOP requires no manual entry, achieving effortless full-process traceability.
-* Bidirectional management integrating equipment maintenance and fault early warning to build a smart O&M ecosystem.
+
+- Fully decoupled frontend-backend architecture enabling independent iteration and team collaboration.
+- RBAC fine-grained authorization with dual frontend route + backend API protection, adaptable to multi-role O&M scenarios.
+- Dual security: JWT stateless authentication + BCrypt one-way password encryption.
+- AOP-powered automatic audit logging with dual-fallback operator resolution (including login operations), delivering end-to-end traceability.
+- MyBatis-Plus with zero XML configuration — only a single hand-written SQL for the 3-table permission JOIN.
+- Complete closed-loop medical device O&M covering both planned maintenance and fault early warning.
