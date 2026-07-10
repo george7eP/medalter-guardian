@@ -133,17 +133,32 @@ git push -u origin HEAD
 ### 💻 第二阶段：本地清理与对齐
 
 用户确认云端已 Merge 后执行：
-1. **切回主干**：`git checkout master`
-2. **拉取最新**：`git pull origin master`
-3. **安全删除分支**：`git branch -d <临时分支名>`
+
+1. **验证云端分支状态**：检查远程分支是否仍存在：
+   ```bash
+   git ls-remote --heads origin <分支名>
+   ```
+   - **若仍存在**：帮助用户删除云端分支 `git push origin --delete <分支名>`，然后继续
+   - **若已删除**：直接继续本地流程
+
+2. **切回主干**：`git checkout master`
+
+3. **拉取最新**：`git pull origin master`
+
+4. **安全删除本地分支**：`git branch -d <临时分支名>`
 
 ---
 
 ### 🧹 第三阶段：Stash 智能审计与清理
 
 本地分支删除后，运行 `git stash list` 检查残留：
-- **若无残留**：流程结束
-- **若有残留**：明确列出 `stash@{X}` 并询问用户是否执行 `git stash drop`
+
+- **若无残留**：流程结束。
+
+- **若有残留**：逐条展示 `stash@{X}` 的备注信息（`git stash list`），并区分处理：
+  - **属于已删除临时分支的草稿**（备注含分支名或明显关联）→ 询问用户是否 `git stash drop stash@{X}` 彻底清除
+  - **属于当前主干的独立工作草稿**（如 master 上暂存的未完成修改）→ 提示用户："该草稿属于当前主干的工作副本，是否需要 `git stash pop stash@{X}` 还原到工作区？"
+  - **无法判断归属** → 列出 `stash@{X}` 并询问用户意图
 
 ---
 
