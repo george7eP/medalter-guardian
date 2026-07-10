@@ -100,7 +100,7 @@ Built around three security pillars — RBAC fine-grained authorization, JWT sta
 ### Backend Package Structure
 
 ```
-src/main/java/com/isoft/yidajava/
+src/main/java/com/isoft/medalterguardian/
 ├── annotation/     # @Log custom audit annotation
 ├── aspect/         # LogAspect around-advice aspect
 ├── common/         # Result unified response, LoginRequest/Response DTOs

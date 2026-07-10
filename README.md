@@ -100,7 +100,7 @@
 ### 後端分層結構
 
 ```
-src/main/java/com/isoft/yidajava/
+src/main/java/com/isoft/medalterguardian/
 ├── annotation/     # @Log 自定義審計註解
 ├── aspect/         # LogAspect AOP 環繞切面
 ├── common/         # Result 統一回應、LoginRequest/Response
