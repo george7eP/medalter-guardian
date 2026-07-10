@@ -106,6 +106,7 @@ medalter-guardian/
 
 - **T7（增强）**：安全与鉴权层测试已成体系（共 **68 测试全绿**）：`JwtUtilTest`（5）、`UserDetailsServiceImplTest`（6，纯 Mockito 分支覆盖）、9 个 Controller 方法级鉴权切片（53）、`AuthControllerTest`（3，穿过安全过滤链的登录流程）。仅余基于真实 DB 的 `@SpringBootTest` 集成测试待补（需 MySQL / Testcontainers / H2 基建决策）。
 - 其余 T1–T6、T8、T9 已完成，原有安全隐患（含复查新发现的 `SysRoleController` 提权隐患）均已解决。
+- **🟡 JwtUtilTest#validateToken_rejectsTampered 偶发失败**：篡改逻辑翻转 JWT 的最后一个字符，但 Base64url 编码的签名段末尾字符可能携带未使用的低位 — 相邻字符（如 `a`↔`b`）解码为同一签名字节，令牌仍有效。概率性失败，与运行时机器的毫秒级时间戳相关。修复方向：应篡改签名字符串**首位**字符（始终携带有效位位，保证签名失效）；或固定时针（mock `System.currentTimeMillis()`）。不影响其它测试，暂缓修复。
 
 ---
 
