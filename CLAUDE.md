@@ -60,7 +60,7 @@ medalter-guardian/
 
 1. **前端路由守卫** — `router.beforeEach` 检查 `meta.permission`，`leftside.vue` 动态过滤菜单
 2. **后端 URL 认证** — `SecurityConfig` 仅放行 `/auth/**` + `OPTIONS`，其余由 `JwtAuthenticationFilter` 验证
-3. **后端方法级鉴权** — `@PreAuthorize("hasAuthority('system:user')")`（当前仅在 `SysUserController` 使用）
+3. **后端方法级鉴权** — 全部 7 个 Controller 22 个端点均已添加 `@PreAuthorize` 注解
 
 ### AOP 审计
 
@@ -101,6 +101,49 @@ medalter-guardian/
 ## 已知问题
 
 （T1–T6 已全部修复，原 6 项已知问题均已解决，剩余为增强性任务 T7/T8。）
+
+---
+
+## 🛠️ 团队 Git 工作流与收尾规范
+
+### 核心原则
+
+**禁止本地直接合并**：不允许在本地直接执行 `git merge` 将功能分支合并到主干（`master`）。
+
+当收到"收工 / 功能跑通 / 完成修复 / 准备提交"指令时，严格执行以下三阶段自动化闭环：
+
+---
+
+### 🌐 第一阶段：代码上云与 PR 报告生成
+
+**Step 1 — Push**：自动将当前本地临时分支（如 `fix/*` 或 `feat/*`）推送到远程 GitHub：
+```bash
+git push -u origin HEAD
+```
+
+**Step 2 — 智能生成 PR 文档**：推送成功后，根据本次代码的 `git diff` 变动，在终端自动输出结构化 GitHub PR Description（Markdown），内容必须包含：
+- **📝 概述 (What & Why)**：本次修改的核心原因和背景
+- **🛠️ 详细改动清单 (Changes)**：具体动了哪些文件和逻辑
+- **🧪 测试验证情况 (Testing)**：功能是如何测通的
+
+**Step 3 — 卡点提示**：明确提示用户前往 GitHub 创建 PR 并确认 Merge，等待用户告知云端合并完成。
+
+---
+
+### 💻 第二阶段：本地清理与对齐
+
+用户确认云端已 Merge 后执行：
+1. **切回主干**：`git checkout master`
+2. **拉取最新**：`git pull origin master`
+3. **安全删除分支**：`git branch -d <临时分支名>`
+
+---
+
+### 🧹 第三阶段：Stash 智能审计与清理
+
+本地分支删除后，运行 `git stash list` 检查残留：
+- **若无残留**：流程结束
+- **若有残留**：明确列出 `stash@{X}` 并询问用户是否执行 `git stash drop`
 
 ---
 
