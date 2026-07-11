@@ -104,7 +104,6 @@ medalter-guardian/
 
 ## 已知问题
 
-- **🟡 `JwtUtilTest#validateToken_rejectsTampered` 偶发失败**：篡改逻辑翻转 JWT 最后一个字符，但 Base64url 签名段末尾字符的未使用低位使相邻字符解码为同一签名字节，令牌仍有效（概率性与时间戳相关）。修复方向：篡改签名**首位**字符，或 mock 时钟。不影响其它测试，暂缓。
 - **DB 集成测试待补**：当前 68 测试均为纯 Mockito / `@WebMvcTest` 切片，无需数据库。仅在确定 MySQL / Testcontainers / H2 基建方案后，才有必要补 `@SpringBootTest` 集成测试。T1–T6、T8、T9 全部完成。
 
 ---
