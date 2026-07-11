@@ -59,9 +59,14 @@ class JwtUtilTest {
     @DisplayName("签名被篡改的令牌校验失败")
     void validateToken_rejectsTampered() {
         String token = jwtUtil.generateToken("admin");
-        // 翻转最后一个字符，破坏签名
-        char last = token.charAt(token.length() - 1);
-        String tampered = token.substring(0, token.length() - 1) + (last == 'a' ? 'b' : 'a');
+        // 篡改签名段（第三段）的首字符，而非末字符：
+        // HS256 的 32 字节签名编码为 43 个 Base64url 字符，末字符仅含 4 位有效位（2 位未用低位），
+        // 翻转末字符可能落到解码结果相同的等价字符，令牌仍有效 → 偶发假绿。
+        // 首字符承载签名首字节的高 6 位，全部有效，改成任一不同合法字符必然改变签名。
+        int sigStart = token.lastIndexOf('.') + 1;
+        char first = token.charAt(sigStart);
+        char replacement = (first == 'A') ? 'B' : 'A';
+        String tampered = token.substring(0, sigStart) + replacement + token.substring(sigStart + 1);
 
         assertFalse(jwtUtil.validateToken(tampered));
     }
