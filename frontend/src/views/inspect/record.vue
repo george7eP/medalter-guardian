@@ -1,5 +1,6 @@
 <template>
   <div class="record-container">
+    <PageHeader title="检修记录" subtitle="历史检修执行记录归档" />
     <el-card class="search-card" shadow="never">
       <el-form :inline="true" :model="searchForm" class="search-form">
         <el-form-item label="关联设备">
@@ -119,6 +120,7 @@
 </template>
 
 <script setup lang="ts">
+import PageHeader from '@/components/common/PageHeader.vue'
 import { ref, reactive, onMounted } from "vue"
 import { ElMessage, ElMessageBox } from "element-plus"
 import { getRecordList, createRecord, updateRecord, deleteRecord } from "@/api/inspect/record"

@@ -2,8 +2,8 @@
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/users'
-import type { Permission } from '@/api/user'
 import {
+  Odometer,
   Management,
   User,
   Setting,
@@ -19,6 +19,7 @@ const userStore = useUserStore()
 const activeMenu = ref('')
 
 const iconMap: Record<string, any> = {
+  dashboard: Odometer,
   device: Monitor,
   inspect: Tools,
   warn: Bell,
@@ -32,6 +33,12 @@ const menuTree = computed(() => {
   const permissions = userStore.permissions || []
 
   const menuItems = [
+    {
+      index: 'dashboard',
+      title: '数据概览',
+      icon: 'dashboard',
+      path: '/dashboard'
+    },
     {
       index: 'device',
       title: '设备管理',
@@ -178,48 +185,119 @@ activeMenu.value = getDefaultActive()
 </script>
 
 <template>
-  <el-menu
-      :default-active="activeMenu"
-      class="el-menu-vertical"
-      background-color="#ffffff"
-      text-color="#303133"
-      active-text-color="#409EFF"
-      @select="handleMenuSelect"
-  >
-    <template v-for="item in menuTree" :key="item.index">
-      <el-sub-menu v-if="item.children && item.children.length > 0" :index="item.index">
-        <template #title>
-          <el-icon>
-            <component :is="getIcon(item.icon)" />
-          </el-icon>
-          <span>{{ item.title }}</span>
-        </template>
-        <el-menu-item
-          v-for="child in item.children"
-          :key="child.index"
-          :index="child.index"
-        >
-          {{ child.title }}
-        </el-menu-item>
-      </el-sub-menu>
+  <div class="side-wrap">
+    <el-menu
+        :default-active="activeMenu"
+        class="el-menu-vertical"
+        @select="handleMenuSelect"
+    >
+      <template v-for="item in menuTree" :key="item.index">
+        <el-sub-menu v-if="item.children && item.children.length > 0" :index="item.index">
+          <template #title>
+            <el-icon><component :is="getIcon(item.icon)" /></el-icon>
+            <span>{{ item.title }}</span>
+          </template>
+          <el-menu-item
+            v-for="child in item.children"
+            :key="child.index"
+            :index="child.index"
+          >
+            {{ child.title }}
+          </el-menu-item>
+        </el-sub-menu>
 
-      <el-menu-item v-else :index="item.index">
-        <el-icon>
-          <component :is="getIcon(item.icon)" />
-        </el-icon>
-        <template #title>{{ item.title }}</template>
-      </el-menu-item>
-    </template>
-  </el-menu>
+        <el-menu-item v-else :index="item.index">
+          <el-icon><component :is="getIcon(item.icon)" /></el-icon>
+          <template #title>{{ item.title }}</template>
+        </el-menu-item>
+      </template>
+    </el-menu>
+
+    <div class="side-footer">
+      <span class="dot" /> 系统运行中
+    </div>
+  </div>
 </template>
 
 <style scoped>
+.side-wrap {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 12px 12px 0;
+}
 .el-menu-vertical {
-  height: calc(100vh - 60px);
+  flex: 1;
   border-right: none;
+  background: transparent;
+  --el-menu-item-height: 46px;
+  --el-menu-sub-item-height: 42px;
 }
 
-.el-menu-vertical:not(.el-menu--collapse) {
-  width: 200px;
+/* 菜单项：圆角胶囊 + 间距 */
+.el-menu-vertical :deep(.el-menu-item),
+.el-menu-vertical :deep(.el-sub-menu__title) {
+  height: 46px;
+  margin: 4px 0;
+  border-radius: 10px;
+  color: var(--mg-text);
+  font-weight: 500;
+}
+.el-menu-vertical :deep(.el-menu-item:hover),
+.el-menu-vertical :deep(.el-sub-menu__title:hover) {
+  background: var(--mg-surface-2);
+  color: var(--mg-ink);
+}
+
+/* 选中态：柔和青绿背景 + 左侧指示条 */
+.el-menu-vertical :deep(.el-menu-item.is-active) {
+  background: var(--mg-primary-soft);
+  color: var(--mg-primary-strong);
+  font-weight: 600;
+}
+.el-menu-vertical :deep(.el-menu-item.is-active::before) {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 9px;
+  bottom: 9px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--mg-primary);
+}
+.el-menu-vertical :deep(.el-sub-menu.is-active > .el-sub-menu__title) {
+  color: var(--mg-primary-strong);
+}
+
+/* 子菜单缩进项 */
+.el-menu-vertical :deep(.el-menu .el-menu-item) {
+  min-width: 0;
+}
+
+.el-menu-vertical :deep(.el-icon) {
+  font-size: 18px;
+}
+
+.side-footer {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 14px 12px;
+  font-size: 12px;
+  color: var(--mg-muted);
+  border-top: 1px solid var(--mg-border);
+  margin-top: 8px;
+}
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--mg-success);
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, .16);
+  animation: mg-pulse 2s var(--mg-ease) infinite;
+}
+@keyframes mg-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .4; }
 }
 </style>

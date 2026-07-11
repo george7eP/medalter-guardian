@@ -1,34 +1,60 @@
 <template>
-  <el-menu
-      :default-active="activeIndex"
-      class="el-menu-demo"
-      mode="horizontal"
-      :ellipsis="false"
-      @select="handleSelect"
-  >
-    <el-menu-item index="0">
-      <div>设备检修与预警系统</div>
-    </el-menu-item>
-    <el-sub-menu index="2">
-      <template #title>{{ userName }}</template>
-      <el-menu-item index="2-1" @click="goToProfile">个人中心</el-menu-item>
-      <el-menu-item index="2-2" @click="showChangePasswordDialog">修改密码</el-menu-item>
-      <el-menu-item index="2-3" @click="handleLogout">退出系统</el-menu-item>
+  <div class="app-header">
+    <!-- 品牌 -->
+    <div class="brand" @click="goHome">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32" width="22" height="22">
+          <path
+            d="M16 2.5 27 6.2v8.3c0 6.6-4.4 12.4-11 15-6.6-2.6-11-8.4-11-15V6.2L16 2.5Z"
+            fill="url(#mgShield)" />
+          <path
+            d="M7.5 16.5h4l1.8-4.2 3 8.4 2-4.2h5.7"
+            fill="none" stroke="#fff" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round" />
+          <defs>
+            <linearGradient id="mgShield" x1="5" y1="3" x2="27" y2="29">
+              <stop offset="0" stop-color="#12B5B5" />
+              <stop offset="1" stop-color="#0B8686" />
+            </linearGradient>
+          </defs>
+        </svg>
+      </span>
+      <span class="brand-text">
+        <span class="brand-title">医疗设备守卫</span>
+        <span class="brand-sub">检修 · 预警管理平台</span>
+      </span>
+    </div>
 
-    </el-sub-menu>
-  </el-menu>
+    <div class="spacer" />
+
+    <!-- 用户区 -->
+    <el-dropdown trigger="click" @command="onCommand">
+      <div class="user-chip">
+        <span class="avatar">{{ avatarText }}</span>
+        <span class="user-name">{{ userName }}</span>
+        <el-icon class="caret"><ArrowDown /></el-icon>
+      </div>
+      <template #dropdown>
+        <el-dropdown-menu>
+          <el-dropdown-item command="profile" :icon="UserIcon">个人中心</el-dropdown-item>
+          <el-dropdown-item command="password" :icon="Lock">修改密码</el-dropdown-item>
+          <el-dropdown-item command="logout" :icon="SwitchButton" divided>退出系统</el-dropdown-item>
+        </el-dropdown-menu>
+      </template>
+    </el-dropdown>
+  </div>
 
   <el-dialog
     v-model="passwordDialogVisible"
     title="修改密码"
-    width="500px"
+    width="460px"
     :close-on-click-modal="false"
   >
     <el-form
       ref="passwordFormRef"
       :model="passwordForm"
       :rules="passwordRules"
-      label-width="100px"
+      label-width="88px"
     >
       <el-form-item label="原密码" prop="oldPassword">
         <el-input
@@ -70,17 +96,23 @@
 import { ref, computed, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
+import {
+  ArrowDown,
+  Lock,
+  SwitchButton,
+  User as UserIcon,
+} from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/users'
 import { changePassword, logout } from '@/api/user'
 
 const router = useRouter()
 const userStore = useUserStore()
 
-const activeIndex = ref('1')
-
 const userName = computed(() => {
   return userStore.userInfo?.realName || userStore.userInfo?.username || '用户'
 })
+
+const avatarText = computed(() => userName.value.trim().charAt(0) || '用')
 
 const passwordDialogVisible = ref(false)
 const passwordLoading = ref(false)
@@ -114,12 +146,18 @@ const passwordRules = reactive<FormRules>({
   ]
 })
 
-function handleSelect(key: string, keyPath: string[]) {
-  console.log(key, keyPath)
+function goHome() {
+  router.push('/')
+}
+
+function onCommand(command: string) {
+  if (command === 'profile') goToProfile()
+  else if (command === 'password') showChangePasswordDialog()
+  else if (command === 'logout') handleLogout()
 }
 
 function goToProfile() {
-  router.push('/user/profile') // ✨ 完美跳转到个人中心
+  router.push('/user/profile')
 }
 
 function showChangePasswordDialog() {
@@ -165,16 +203,15 @@ async function handleLogout() {
       type: 'warning'
     })
 
-    // ✨ 关键修复：必须【先】呼叫后端 API，这时候 Token 还活著，后端才能成功解析并记录是谁登出的！
+    // 先呼叫后端 API（此时 Token 仍有效，后端才能记录登出者），再清理前端状态
     try {
-        await logout() 
+      await logout()
     } catch (e) {
-        console.warn('后端登出接口请求失败，仍会强制清除本地状态')
+      console.warn('后端登出接口请求失败，仍会强制清除本地状态')
     }
 
-    // ✨ 呼叫完后端之后，【再】清理前端状态 (删除本地 Token)
     userStore.logout()
-    
+
     ElMessage.success('已退出系统')
     router.push('/login')
 
@@ -187,7 +224,82 @@ async function handleLogout() {
 </script>
 
 <style scoped>
-.el-menu--horizontal > .el-menu-item:nth-child(1) {
-  margin-right: auto;
+.app-header {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: 0 20px 0 18px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  cursor: pointer;
+  user-select: none;
+}
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: var(--mg-primary-soft);
+  transition: transform var(--mg-dur) var(--mg-ease);
+}
+.brand:hover .brand-mark {
+  transform: translateY(-1px) rotate(-4deg);
+}
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+.brand-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--mg-ink);
+  letter-spacing: .5px;
+}
+.brand-sub {
+  font-size: 11px;
+  color: var(--mg-muted);
+  letter-spacing: .5px;
+}
+
+.spacer { flex: 1; }
+
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 5px 10px 5px 5px;
+  border-radius: 999px;
+  cursor: pointer;
+  outline: none;
+  transition: background-color var(--mg-dur-fast) var(--mg-ease);
+}
+.user-chip:hover {
+  background: var(--mg-surface-2);
+}
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #12B5B5, #0B8686);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+}
+.user-name {
+  font-size: 14px;
+  color: var(--mg-ink);
+  font-weight: 500;
+}
+.caret {
+  font-size: 12px;
+  color: var(--mg-muted);
 }
 </style>

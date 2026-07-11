@@ -4,14 +4,18 @@
       <el-header>
         <Top />
       </el-header>
-      
-      <el-container>
-        <el-aside width="200px">
+
+      <el-container class="body-container">
+        <el-aside :width="'var(--mg-aside-w)'">
           <Leftside />
         </el-aside>
-        
+
         <el-main>
-          <router-view />
+          <router-view v-slot="{ Component, route }">
+            <transition name="mg-fade" mode="out-in">
+              <component :is="Component" :key="route.path" />
+            </transition>
+          </router-view>
         </el-main>
       </el-container>
     </el-container>
@@ -24,18 +28,29 @@ import Leftside from "@/components/layout/leftside.vue";
 </script>
 
 <style scoped>
-.common-layout, .el-container {
-  height: 100vh; /* 让整个布局撑满萤幕高度 */
+.common-layout,
+.common-layout > .el-container {
+  height: 100vh;
 }
 .el-header {
-  padding: 0; /* 消除顶部导航栏预设的内边距 */
-  border-bottom: 1px solid #dcdfe6;
+  padding: 0;
+  height: var(--mg-header-h);
+  background: var(--mg-surface);
+  border-bottom: 1px solid var(--mg-border);
+  box-shadow: 0 1px 0 rgba(27, 42, 56, .02);
+  z-index: 10;
+}
+.body-container {
+  height: calc(100vh - var(--mg-header-h));
 }
 .el-aside {
-  border-right: 1px solid #dcdfe6;
-  background-color: #fff;
+  border-right: 1px solid var(--mg-border);
+  background-color: var(--mg-surface);
+  transition: width var(--mg-dur) var(--mg-ease);
 }
 .el-main {
-  background-color: #f5f7fa; /* 给主体内容区域加一点浅灰背景，让白色卡片更凸显 */
+  background-color: var(--mg-bg);
+  padding: 22px 24px;
+  overflow-y: auto;
 }
 </style>
