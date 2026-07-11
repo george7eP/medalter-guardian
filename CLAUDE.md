@@ -99,6 +99,8 @@ medalter-guardian/
 | T7 | 补充单元测试与集成测试 | 🟢 低 | ✅ | — |
 | T9 | `SysRoleController` 补全方法级 `@PreAuthorize`（复查发现的提权隐患） | 🔴 高 | ✅ | T2 |
 | T8 | README.md 中版本号与实际 pom.xml / package.json / engines 持续同步 | 🟢 低 | ✅ | — |
+| T10 | 前端繁体中文统一转简体（OpenCC t2s，19 文件 948 字符）+ `lang="zh-CN"` + 简体字体栈 | 🟡 中 | ✅ | — |
+| T11 | 前端 UI 视觉优化/重构（配图、动画、去单调） | 🟡 中 | ⬜ | T10 |
 
 ---
 

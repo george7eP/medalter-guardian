@@ -119,7 +119,7 @@ function handleSelect(key: string, keyPath: string[]) {
 }
 
 function goToProfile() {
-  router.push('/user/profile') // ✨ 完美跳轉到個人中心
+  router.push('/user/profile') // ✨ 完美跳转到个人中心
 }
 
 function showChangePasswordDialog() {
@@ -165,14 +165,14 @@ async function handleLogout() {
       type: 'warning'
     })
 
-    // ✨ 關鍵修復：必須【先】呼叫後端 API，這時候 Token 還活著，後端才能成功解析並記錄是誰登出的！
+    // ✨ 关键修复：必须【先】呼叫后端 API，这时候 Token 还活著，后端才能成功解析并记录是谁登出的！
     try {
         await logout() 
     } catch (e) {
-        console.warn('後端登出接口請求失敗，仍會強制清除本地狀態')
+        console.warn('后端登出接口请求失败，仍会强制清除本地状态')
     }
 
-    // ✨ 呼叫完後端之後，【再】清理前端狀態 (刪除本地 Token)
+    // ✨ 呼叫完后端之后，【再】清理前端状态 (删除本地 Token)
     userStore.logout()
     
     ElMessage.success('已退出系统')

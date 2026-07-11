@@ -2,11 +2,11 @@
   <div class="role-container">
     <el-card class="search-card" shadow="never">
       <el-form :inline="true" :model="searchForm" class="search-form">
-        <el-form-item label="角色名稱">
-          <el-input v-model="searchForm.roleName" placeholder="請輸入角色名稱" clearable />
+        <el-form-item label="角色名称">
+          <el-input v-model="searchForm.roleName" placeholder="请输入角色名称" clearable />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="handleSearch">搜尋</el-button>
+          <el-button type="primary" @click="handleSearch">搜寻</el-button>
           <el-button @click="resetSearch">重置</el-button>
         </el-form-item>
       </el-form>
@@ -19,14 +19,14 @@
 
       <el-table :data="tableData" style="width: 100%" v-loading="loading" border stripe>
         <el-table-column prop="id" label="ID" width="80" align="center" />
-        <el-table-column prop="roleName" label="角色名稱" min-width="150" />
-        <el-table-column prop="roleCode" label="角色編碼" min-width="150" />
-        <el-table-column prop="remark" label="備註" min-width="200" show-overflow-tooltip />
-        <el-table-column prop="createTime" label="創建時間" width="180" align="center" />
+        <el-table-column prop="roleName" label="角色名称" min-width="150" />
+        <el-table-column prop="roleCode" label="角色编码" min-width="150" />
+        <el-table-column prop="remark" label="备注" min-width="200" show-overflow-tooltip />
+        <el-table-column prop="createTime" label="创建时间" width="180" align="center" />
         <el-table-column fixed="right" label="操作" width="180" align="center">
           <template #default="{ row }">
-            <el-button link type="primary" size="small" @click="handleEdit(row)">編輯</el-button>
-            <el-button link type="danger" size="small" @click="handleDelete(row)">刪除</el-button>
+            <el-button link type="primary" size="small" @click="handleEdit(row)">编辑</el-button>
+            <el-button link type="danger" size="small" @click="handleDelete(row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -46,19 +46,19 @@
 
     <el-dialog v-model="dialogVisible" :title="dialogTitle" width="500px" destroy-on-close>
       <el-form :model="roleForm" label-width="90px">
-        <el-form-item label="角色名稱" required>
-          <el-input v-model="roleForm.roleName" placeholder="例如：系統管理員" />
+        <el-form-item label="角色名称" required>
+          <el-input v-model="roleForm.roleName" placeholder="例如：系统管理员" />
         </el-form-item>
-        <el-form-item label="角色編碼" required>
+        <el-form-item label="角色编码" required>
           <el-input v-model="roleForm.roleCode" :disabled="isEdit" placeholder="例如：ROLE_ADMIN" />
         </el-form-item>
-        <el-form-item label="備註">
-          <el-input v-model="roleForm.remark" type="textarea" placeholder="請輸入角色描述說明" />
+        <el-form-item label="备注">
+          <el-input v-model="roleForm.remark" type="textarea" placeholder="请输入角色描述说明" />
         </el-form-item>
       </el-form>
       <template #footer>
         <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="submitForm" :loading="submitLoading">確定保存</el-button>
+        <el-button type="primary" @click="submitForm" :loading="submitLoading">确定保存</el-button>
       </template>
     </el-dialog>
   </div>
@@ -100,7 +100,7 @@ const fetchRoleList = async () => {
     tableData.value = result.records || result.list || []
     total.value = result.total || 0
   } catch (error) {
-    console.error('獲取角色列表失敗:', error)
+    console.error('获取角色列表失败:', error)
   } finally {
     loading.value = false
   }
@@ -118,7 +118,7 @@ const handleAdd = () => {
 
 const handleEdit = (row: RoleInfo) => {
   isEdit.value = true
-  dialogTitle.value = '編輯角色'
+  dialogTitle.value = '编辑角色'
   Object.assign(roleForm, {
     id: row.id,
     roleName: row.roleName,
@@ -130,7 +130,7 @@ const handleEdit = (row: RoleInfo) => {
 
 const submitForm = async () => {
   if (!roleForm.roleName || !roleForm.roleCode) {
-    ElMessage.warning('請填寫必填欄位')
+    ElMessage.warning('请填写必填栏位')
     return
   }
   submitLoading.value = true
@@ -145,7 +145,7 @@ const submitForm = async () => {
     dialogVisible.value = false
     fetchRoleList()
   } catch (error) {
-    console.error('保存角色失敗:', error)
+    console.error('保存角色失败:', error)
   } finally {
     submitLoading.value = false
   }
@@ -153,9 +153,9 @@ const submitForm = async () => {
 
 const handleDelete = async (row: RoleInfo) => {
   try {
-    await ElMessageBox.confirm(`確定要刪除角色 "${row.roleName}" 嗎？`, '警告', { type: 'error' })
+    await ElMessageBox.confirm(`确定要删除角色 "${row.roleName}" 吗？`, '警告', { type: 'error' })
     await deleteRole(row.id)
-    ElMessage.success('刪除成功')
+    ElMessage.success('删除成功')
     fetchRoleList()
   } catch {}
 }

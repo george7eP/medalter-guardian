@@ -1,6 +1,6 @@
 import request from '@/util/request'
 
-// --- 授權與登入相關介面 ---
+// --- 授权与登入相关介面 ---
 export interface Permission {
   apiUrl: string
   id: number
@@ -25,7 +25,7 @@ export interface LoginResult {
   permissions: Permission[]
 }
 
-// --- 用戶管理相關介面 (嚴格對齊資料庫) ---
+// --- 用户管理相关介面 (严格对齐资料库) ---
 export interface UserInfo {
   id: number
   username: string
@@ -46,9 +46,9 @@ export interface UserForm {
   status?: number
 }
 
-// --- API 請求函數 ---
+// --- API 请求函数 ---
 
-// 1. 登入與基礎操作
+// 1. 登入与基础操作
 export function login(data: LoginParams) {
   return request.post<LoginResult>('/auth/login', data)
 }
@@ -65,7 +65,7 @@ export function getCurrentUser() {
   return request.get<UserInfo>('/user/info')
 }
 
-// 2. 用戶 CRUD 操作
+// 2. 用户 CRUD 操作
 export function getUserList(params?: any) {
   return request.get('/user', { params })
 }
@@ -83,14 +83,14 @@ export function deleteUser(id: number) {
 }
 
 /**
- * ✨ 新增：獲取指定用戶擁有的角色 ID 列表
+ * ✨ 新增：获取指定用户拥有的角色 ID 列表
  */
 export function getUserRoleIds(userId: number) {
   return request.get<number[]>(`/user/${userId}/roles`)
 }
 
 /**
- * ✨ 新增：給指定用戶分配多個角色
+ * ✨ 新增：给指定用户分配多个角色
  */
 export function assignUserRoles(userId: number, roleIds: number[]) {
   return request.put(`/user/${userId}/roles`, roleIds)

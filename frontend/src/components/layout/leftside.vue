@@ -96,7 +96,7 @@ const menuTree = computed(() => {
         },
         {
           index: 'log',
-          title: '日誌管理',
+          title: '日志管理',
           permission: 'system:log',
           path: '/system/log'
         }

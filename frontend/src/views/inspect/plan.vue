@@ -2,19 +2,19 @@
   <div class="plan-container">
     <el-card class="search-card" shadow="never">
       <el-form :inline="true" :model="searchForm" class="search-form">
-        <el-form-item label="關聯設備">
-          <el-select v-model="searchForm.deviceId" placeholder="請選擇設備" clearable filterable style="width: 200px">
+        <el-form-item label="关联设备">
+          <el-select v-model="searchForm.deviceId" placeholder="请选择设备" clearable filterable style="width: 200px">
             <el-option v-for="dev in deviceOptions" :key="dev.id" :label="dev.deviceName" :value="dev.id!" />
           </el-select>
         </el-form-item>
-        <el-form-item label="計畫狀態">
-          <el-select v-model="searchForm.planStatus" placeholder="選擇狀態" clearable style="width: 150px">
-            <el-option label="待執行" value="PENDING" />
+        <el-form-item label="计划状态">
+          <el-select v-model="searchForm.planStatus" placeholder="选择状态" clearable style="width: 150px">
+            <el-option label="待执行" value="PENDING" />
             <el-option label="已完成" value="COMPLETED" />
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="handleSearch">搜尋</el-button>
+          <el-button type="primary" @click="handleSearch">搜寻</el-button>
           <el-button @click="resetSearch">重置</el-button>
         </el-form-item>
       </el-form>
@@ -22,30 +22,30 @@
 
     <el-card class="table-card" shadow="never">
       <div class="toolbar">
-        <el-button type="primary" @click="handleAdd">新增檢修計畫</el-button>
+        <el-button type="primary" @click="handleAdd">新增检修计划</el-button>
       </div>
 
       <el-table :data="tableData" style="width: 100%" v-loading="loading" border stripe>
         <el-table-column prop="id" label="ID" width="70" align="center" />
-        <el-table-column label="關聯設備" min-width="150">
+        <el-table-column label="关联设备" min-width="150">
           <template #default="{ row }">
             {{ getDeviceName(row.deviceId) }}
           </template>
         </el-table-column>
-        <el-table-column prop="planDate" label="計畫日期" width="120" align="center" />
-        <el-table-column prop="inspectContent" label="檢修內容" min-width="200" show-overflow-tooltip />
-        <el-table-column prop="principal" label="負責人" width="120" align="center" />
-        <el-table-column prop="planStatus" label="狀態" width="100" align="center">
+        <el-table-column prop="planDate" label="计划日期" width="120" align="center" />
+        <el-table-column prop="inspectContent" label="检修内容" min-width="200" show-overflow-tooltip />
+        <el-table-column prop="principal" label="负责人" width="120" align="center" />
+        <el-table-column prop="planStatus" label="状态" width="100" align="center">
           <template #default="{ row }">
             <el-tag :type="row.planStatus === 'COMPLETED' ? 'success' : 'warning'">
-              {{ row.planStatus === 'COMPLETED' ? '已完成' : '待執行' }}
+              {{ row.planStatus === 'COMPLETED' ? '已完成' : '待执行' }}
             </el-tag>
           </template>
         </el-table-column>
         <el-table-column fixed="right" label="操作" width="150" align="center">
           <template #default="{ row }">
-            <el-button link type="primary" size="small" @click="handleEdit(row)">編輯</el-button>
-            <el-button link type="danger" size="small" @click="handleDelete(row)">刪除</el-button>
+            <el-button link type="primary" size="small" @click="handleEdit(row)">编辑</el-button>
+            <el-button link type="danger" size="small" @click="handleDelete(row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -65,33 +65,33 @@
 
     <el-dialog v-model="dialogVisible" :title="dialogTitle" width="500px" destroy-on-close>
       <el-form :model="planForm" label-width="90px">
-        <el-form-item label="關聯設備" required>
-          <el-select v-model="planForm.deviceId" placeholder="請選擇要檢修的設備" filterable style="width: 100%">
+        <el-form-item label="关联设备" required>
+          <el-select v-model="planForm.deviceId" placeholder="请选择要检修的设备" filterable style="width: 100%">
             <el-option v-for="dev in deviceOptions" :key="dev.id" :label="dev.deviceName" :value="dev.id!" />
           </el-select>
         </el-form-item>
-        <el-form-item label="計畫日期" required>
-          <el-date-picker v-model="planForm.planDate" type="date" value-format="YYYY-MM-DD" placeholder="選擇日期" style="width: 100%" />
+        <el-form-item label="计划日期" required>
+          <el-date-picker v-model="planForm.planDate" type="date" value-format="YYYY-MM-DD" placeholder="选择日期" style="width: 100%" />
         </el-form-item>
-        <el-form-item label="負責人" required>
-          <el-input v-model="planForm.principal" placeholder="請輸入負責人姓名" />
+        <el-form-item label="负责人" required>
+          <el-input v-model="planForm.principal" placeholder="请输入负责人姓名" />
         </el-form-item>
-        <el-form-item label="檢修內容" required>
-          <el-input v-model="planForm.inspectContent" type="textarea" :rows="3" placeholder="請描述預計要進行的檢修項目" />
+        <el-form-item label="检修内容" required>
+          <el-input v-model="planForm.inspectContent" type="textarea" :rows="3" placeholder="请描述预计要进行的检修项目" />
         </el-form-item>
-        <el-form-item label="計畫狀態">
+        <el-form-item label="计划状态">
           <el-radio-group v-model="planForm.planStatus">
-            <el-radio value="PENDING">待執行</el-radio>
+            <el-radio value="PENDING">待执行</el-radio>
             <el-radio value="COMPLETED">已完成</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="備註">
-          <el-input v-model="planForm.remark" placeholder="選填" />
+        <el-form-item label="备注">
+          <el-input v-model="planForm.remark" placeholder="选填" />
         </el-form-item>
       </el-form>
       <template #footer>
         <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="submitForm" :loading="submitLoading">確定保存</el-button>
+        <el-button type="primary" @click="submitForm" :loading="submitLoading">确定保存</el-button>
       </template>
     </el-dialog>
   </div>
@@ -102,11 +102,11 @@ import { ref, reactive, onMounted } from "vue"
 import { ElMessage, ElMessageBox } from "element-plus"
 import { getPlanList, createPlan, updatePlan, deletePlan } from "@/api/inspect/plan"
 import type { InspectPlan } from "@/api/inspect/plan"
-import { getDeviceList } from "@/api/device" // 引入設備 API 以獲取下拉選單
+import { getDeviceList } from "@/api/device" // 引入设备 API 以获取下拉选单
 import type { DeviceInfo } from "@/api/device"
 
 const tableData = ref<InspectPlan[]>([])
-const deviceOptions = ref<DeviceInfo[]>([]) // 存放設備清單
+const deviceOptions = ref<DeviceInfo[]>([]) // 存放设备清单
 const loading = ref(false)
 const submitLoading = ref(false)
 const total = ref(0)
@@ -127,20 +127,20 @@ const planForm = reactive<InspectPlan>({
   remark: ''
 })
 
-// 獲取設備清單 (用於下拉選單與名稱對應)
+// 获取设备清单 (用于下拉选单与名称对应)
 const fetchDeviceOptions = async () => {
   try {
     const res: any = await getDeviceList({ page: 1, pageSize: 1000 })
     deviceOptions.value = res.records || res.list || []
   } catch (error) {
-    console.error('獲取設備選單失敗', error)
+    console.error('获取设备选单失败', error)
   }
 }
 
-// 根據 ID 匹配設備名稱
+// 根据 ID 匹配设备名称
 const getDeviceName = (id: number) => {
   const device = deviceOptions.value.find(d => d.id === id)
-  return device ? device.deviceName : `未知設備(${id})`
+  return device ? device.deviceName : `未知设备(${id})`
 }
 
 const fetchPlanList = async () => {
@@ -156,7 +156,7 @@ const fetchPlanList = async () => {
     tableData.value = result.records || result.list || []
     total.value = result.total || 0
   } catch (error) {
-    console.error('獲取計畫列表失敗:', error)
+    console.error('获取计划列表失败:', error)
   } finally {
     loading.value = false
   }
@@ -167,7 +167,7 @@ const resetSearch = () => { searchForm.deviceId = undefined; searchForm.planStat
 
 const handleAdd = () => {
   isEdit.value = false
-  dialogTitle.value = '新增檢修計畫'
+  dialogTitle.value = '新增检修计划'
   Object.assign(planForm, {
     id: undefined, deviceId: undefined, planDate: '', inspectContent: '',
     principal: '', planStatus: 'PENDING', remark: ''
@@ -177,29 +177,29 @@ const handleAdd = () => {
 
 const handleEdit = (row: InspectPlan) => {
   isEdit.value = true
-  dialogTitle.value = '編輯檢修計畫'
+  dialogTitle.value = '编辑检修计划'
   Object.assign(planForm, row)
   dialogVisible.value = true
 }
 
 const submitForm = async () => {
   if (!planForm.deviceId || !planForm.planDate || !planForm.inspectContent) {
-    ElMessage.warning('請填寫必填項目')
+    ElMessage.warning('请填写必填项目')
     return
   }
   submitLoading.value = true
   try {
     if (isEdit.value && planForm.id) {
       await updatePlan(planForm.id, planForm)
-      ElMessage.success('計畫更新成功')
+      ElMessage.success('计划更新成功')
     } else {
       await createPlan(planForm)
-      ElMessage.success('計畫添加成功')
+      ElMessage.success('计划添加成功')
     }
     dialogVisible.value = false
     fetchPlanList()
   } catch (error) {
-    console.error('保存計畫失敗:', error)
+    console.error('保存计划失败:', error)
   } finally {
     submitLoading.value = false
   }
@@ -207,9 +207,9 @@ const submitForm = async () => {
 
 const handleDelete = async (row: InspectPlan) => {
   try {
-    await ElMessageBox.confirm('確定要刪除這條檢修計畫嗎？', '警告', { type: 'error' })
+    await ElMessageBox.confirm('确定要删除这条检修计划吗？', '警告', { type: 'error' })
     await deletePlan(row.id!)
-    ElMessage.success('刪除成功')
+    ElMessage.success('删除成功')
     fetchPlanList()
   } catch {}
 }
