@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useUserStore } from '@/stores/users'
-import { ElMessage } from 'element-plus' // ✨ 引入訊息提示
+import { ElMessage } from 'element-plus' // ✨ 引入讯息提示
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -14,24 +14,24 @@ const router = createRouter({
       path: '/',
       name: 'main',
       component: () => import('@/views/main.vue'),
-      redirect: '/device', // ✨ 關鍵修復：把登入後的預設首頁改成 /device，不要再預設跳到敏感的 /user
+      redirect: '/device', // ✨ 关键修复：把登入后的预设首页改成 /device，不要再预设跳到敏感的 /user
       children: [
         {
           path: '/user',
           name: 'user',
-          meta: { permission: 'system:user' }, // ✨ 綁定權限標籤
+          meta: { permission: 'system:user' }, // ✨ 绑定权限标签
           component: () => import('@/views/user/userlist.vue'),
         },
         {
           path: '/system/role',
           name: 'role',
-          meta: { permission: 'system:role' }, // ✨ 綁定權限標籤
+          meta: { permission: 'system:role' }, // ✨ 绑定权限标签
           component: () => import('@/views/system/role.vue'),
         },
         {
           path: '/system/log',
           name: 'system-log',
-          meta: { permission: 'system:log' }, // ✨ 綁定權限標籤
+          meta: { permission: 'system:log' }, // ✨ 绑定权限标签
           component: () => import('@/views/system/log.vue'),
         },
         {
@@ -74,7 +74,7 @@ const router = createRouter({
   ],
 })
 
-// 全局路由守衛 (攔截越權訪問)
+// 全局路由守卫 (拦截越权访问)
 router.beforeEach((to, from, next) => {
   const userStore = useUserStore()
 
@@ -86,11 +86,11 @@ router.beforeEach((to, from, next) => {
     }
   } else {
     if (userStore.isLoggedIn) {
-      // 檢查即將前往的路由是否需要特定權限
+      // 检查即将前往的路由是否需要特定权限
       if (to.meta.permission && !userStore.hasPermission(to.meta.permission as string)) {
-        ElMessage.error('拒絕訪問：您沒有權限進入此頁面')
-        // 如果沒有權限，踢回上一個頁面或設備管理首頁
-        // 如果沒有權限，踢回上一個頁面或設備管理首頁
+        ElMessage.error('拒绝访问：您没有权限进入此页面')
+        // 如果没有权限，踢回上一个页面或设备管理首页
+        // 如果没有权限，踢回上一个页面或设备管理首页
         if (from.path === '/') {
           next('/device')
         } else {

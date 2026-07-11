@@ -2,9 +2,9 @@ import request from '@/util/request'
 
 export interface RoleInfo {
     id: number
-    roleCode: string // 角色編碼
-    roleName: string // 角色名稱
-    remark?: string  // 備註
+    roleCode: string // 角色编码
+    roleName: string // 角色名称
+    remark?: string  // 备注
     createTime?: string
 }
 
@@ -15,12 +15,12 @@ export interface RoleForm {
     remark?: string
 }
 
-// 獲取角色分頁列表
+// 获取角色分页列表
 export function getRoleList(params?: any) {
     return request.get('/role', { params })
 }
 
-// 創建新角色
+// 创建新角色
 export function createRole(data: RoleForm) {
     return request.post('/role', data)
 }
@@ -30,7 +30,7 @@ export function updateRole(id: number, data: RoleForm) {
     return request.put(`/role/${id}`, data)
 }
 
-// 刪除角色
+// 删除角色
 export function deleteRole(id: number) {
     return request.delete(`/role/${id}`)
 }

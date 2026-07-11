@@ -5,24 +5,24 @@
         <el-card class="box-card" shadow="never" v-loading="loading">
           <template #header>
             <div class="card-header">
-              <span>基本資料</span>
+              <span>基本资料</span>
             </div>
           </template>
           <div class="avatar-box">
             <el-avatar :size="80" src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png" />
             <h3>{{ userInfo.realName }}</h3>
-            <el-tag type="success">系統使用者</el-tag>
+            <el-tag type="success">系统使用者</el-tag>
           </div>
           <el-descriptions :column="1" border class="profile-desc">
-            <el-descriptions-item label="登入帳號">{{ userInfo.username }}</el-descriptions-item>
-            <el-descriptions-item label="手機號碼">{{ userInfo.phone || '未填寫' }}</el-descriptions-item>
-            <el-descriptions-item label="電子信箱">{{ userInfo.email || '未填寫' }}</el-descriptions-item>
-            <el-descriptions-item label="帳號狀態">
+            <el-descriptions-item label="登入帐号">{{ userInfo.username }}</el-descriptions-item>
+            <el-descriptions-item label="手机号码">{{ userInfo.phone || '未填写' }}</el-descriptions-item>
+            <el-descriptions-item label="电子信箱">{{ userInfo.email || '未填写' }}</el-descriptions-item>
+            <el-descriptions-item label="帐号状态">
               <el-tag :type="userInfo.status === 1 ? 'success' : 'danger'">
-                {{ userInfo.status === 1 ? '正常啟用' : '停用' }}
+                {{ userInfo.status === 1 ? '正常启用' : '停用' }}
               </el-tag>
             </el-descriptions-item>
-            <el-descriptions-item label="註冊時間">{{ userInfo.createTime || '無資料' }}</el-descriptions-item>
+            <el-descriptions-item label="注册时间">{{ userInfo.createTime || '无资料' }}</el-descriptions-item>
           </el-descriptions>
         </el-card>
       </el-col>
@@ -31,24 +31,24 @@
         <el-card class="box-card" shadow="never">
           <template #header>
             <div class="card-header">
-              <span>修改資料</span>
+              <span>修改资料</span>
             </div>
           </template>
           <el-form :model="editForm" label-width="100px" style="max-width: 450px; padding-top: 20px;">
-            <el-form-item label="登入帳號">
+            <el-form-item label="登入帐号">
               <el-input v-model="editForm.username" disabled />
             </el-form-item>
-            <el-form-item label="真實姓名" required>
-              <el-input v-model="editForm.realName" placeholder="請輸入真實姓名" />
+            <el-form-item label="真实姓名" required>
+              <el-input v-model="editForm.realName" placeholder="请输入真实姓名" />
             </el-form-item>
-            <el-form-item label="手機號碼">
-              <el-input v-model="editForm.phone" placeholder="請輸入手機號碼" />
+            <el-form-item label="手机号码">
+              <el-input v-model="editForm.phone" placeholder="请输入手机号码" />
             </el-form-item>
-            <el-form-item label="電子信箱">
-              <el-input v-model="editForm.email" placeholder="請輸入電子郵件" />
+            <el-form-item label="电子信箱">
+              <el-input v-model="editForm.email" placeholder="请输入电子邮件" />
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="handleSave" :loading="submitLoading">儲存修改</el-button>
+              <el-button type="primary" @click="handleSave" :loading="submitLoading">储存修改</el-button>
             </el-form-item>
           </el-form>
         </el-card>
@@ -75,14 +75,14 @@ const editForm = reactive({
   id: undefined, username: '', realName: '', phone: '', email: '', status: 1
 })
 
-// 載入當前登入者資訊
+// 载入当前登入者资讯
 const loadProfile = async () => {
   loading.value = true
   try {
     const data = await getCurrentUser()
     userInfo.value = data
     
-    // 初始化同步至修改表單
+    // 初始化同步至修改表单
     editForm.id = data.id as any
     editForm.username = data.username
     editForm.realName = data.realName
@@ -90,24 +90,24 @@ const loadProfile = async () => {
     editForm.email = data.email
     editForm.status = data.status
   } catch (error) {
-    console.error("載入個人中心失敗", error)
+    console.error("载入个人中心失败", error)
   } finally {
     loading.value = false
   }
 }
 
-// 提交個人資料變更
+// 提交个人资料变更
 const handleSave = async () => {
   if (!editForm.realName) {
-    ElMessage.warning("真實姓名不能為空")
+    ElMessage.warning("真实姓名不能为空")
     return
   }
   submitLoading.value = true
   try {
     await updateUser(editForm.id!, editForm as any)
-    ElMessage.success("個人資料更新成功！")
+    ElMessage.success("个人资料更新成功！")
     
-    // 異步刷新 Pinia 全局的使用者資訊快取
+    // 异步刷新 Pinia 全局的使用者资讯快取
     userStore.setUserInfo({
       username: editForm.username,
       realName: editForm.realName
@@ -115,7 +115,7 @@ const handleSave = async () => {
     
     loadProfile()
   } catch (error) {
-    console.error("儲存失敗", error)
+    console.error("储存失败", error)
   } finally {
     submitLoading.value = false
   }

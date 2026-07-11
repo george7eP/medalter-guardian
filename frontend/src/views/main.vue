@@ -25,10 +25,10 @@ import Leftside from "@/components/layout/leftside.vue";
 
 <style scoped>
 .common-layout, .el-container {
-  height: 100vh; /* 讓整個佈局撐滿螢幕高度 */
+  height: 100vh; /* 让整个布局撑满萤幕高度 */
 }
 .el-header {
-  padding: 0; /* 消除頂部導航欄預設的內邊距 */
+  padding: 0; /* 消除顶部导航栏预设的内边距 */
   border-bottom: 1px solid #dcdfe6;
 }
 .el-aside {
@@ -36,6 +36,6 @@ import Leftside from "@/components/layout/leftside.vue";
   background-color: #fff;
 }
 .el-main {
-  background-color: #f5f7fa; /* 給主體內容區域加一點淺灰背景，讓白色卡片更凸顯 */
+  background-color: #f5f7fa; /* 给主体内容区域加一点浅灰背景，让白色卡片更凸显 */
 }
 </style>

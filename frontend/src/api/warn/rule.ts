@@ -2,11 +2,11 @@ import request from '@/util/request'
 
 export interface WarnRule {
     id?: number
-    deviceId?: number | null  // 若為 null 代表是全局規則
+    deviceId?: number | null  // 若为 null 代表是全局规则
     warnCondition: string
     warnLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT'
     notifyType: string
-    ruleStatus: number // 1 啟用, 0 禁用
+    ruleStatus: number // 1 启用, 0 禁用
     remark?: string
     createTime?: string
     updateTime?: string

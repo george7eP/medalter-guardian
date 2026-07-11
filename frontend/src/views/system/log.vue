@@ -3,10 +3,10 @@
     <el-card class="search-card" shadow="never">
       <el-form :inline="true" :model="searchForm" class="search-form">
         <el-form-item label="操作人">
-          <el-input v-model="searchForm.username" placeholder="請輸入帳號" clearable />
+          <el-input v-model="searchForm.username" placeholder="请输入帐号" clearable />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="handleSearch">搜尋</el-button>
+          <el-button type="primary" @click="handleSearch">搜寻</el-button>
           <el-button @click="resetSearch">重置</el-button>
         </el-form-item>
       </el-form>
@@ -21,15 +21,15 @@
           </template>
         </el-table-column>
         <el-table-column prop="operation" label="操作描述" width="150" />
-        <el-table-column prop="method" label="請求方法" min-width="200" show-overflow-tooltip />
-        <el-table-column prop="params" label="傳入參數" min-width="200" show-overflow-tooltip />
+        <el-table-column prop="method" label="请求方法" min-width="200" show-overflow-tooltip />
+        <el-table-column prop="params" label="传入参数" min-width="200" show-overflow-tooltip />
         <el-table-column prop="ip" label="IP地址" width="130" align="center" />
-        <el-table-column prop="time" label="耗時(ms)" width="100" align="center">
+        <el-table-column prop="time" label="耗时(ms)" width="100" align="center">
           <template #default="{ row }">
             <el-tag :type="row.time > 500 ? 'danger' : 'success'">{{ row.time }} ms</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="createTime" label="操作時間" width="170" align="center" />
+        <el-table-column prop="createTime" label="操作时间" width="170" align="center" />
       </el-table>
 
       <div class="pagination-container">

@@ -16,7 +16,7 @@ export function getWarnList(params: any) {
     return request.get('/warn/info', { params })
 }
 
-// 提交處理結果
+// 提交处理结果
 export function handleWarn(id: number, data: Partial<WarnInfo>) {
     return request.put(`/warn/info/handle/${id}`, data)
 }

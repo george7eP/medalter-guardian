@@ -23,22 +23,22 @@ export interface DeviceListParams {
     deviceStatus?: string
 }
 
-// 獲取設備分頁列表
+// 获取设备分页列表
 export function getDeviceList(params: DeviceListParams) {
     return request.get('/device', { params })
 }
 
-// 新增設備
+// 新增设备
 export function createDevice(data: DeviceInfo) {
     return request.post('/device', data)
 }
 
-// 修改設備
+// 修改设备
 export function updateDevice(id: number, data: DeviceInfo) {
     return request.put(`/device/${id}`, data)
 }
 
-// 刪除設備
+// 删除设备
 export function deleteDevice(id: number) {
     return request.delete(`/device/${id}`)
 }

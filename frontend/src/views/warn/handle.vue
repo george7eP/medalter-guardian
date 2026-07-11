@@ -2,28 +2,28 @@
   <div class="warn-handle-container">
     <el-card class="search-card" shadow="never">
       <el-form :inline="true" :model="searchForm" class="search-form">
-        <el-form-item label="關聯設備">
-          <el-select v-model="searchForm.deviceId" placeholder="選擇設備過濾" clearable filterable style="width: 200px">
+        <el-form-item label="关联设备">
+          <el-select v-model="searchForm.deviceId" placeholder="选择设备过滤" clearable filterable style="width: 200px">
             <el-option v-for="dev in deviceOptions" :key="dev.id" :label="dev.deviceName" :value="dev.id!" />
           </el-select>
         </el-form-item>
-        <el-form-item label="處理狀態">
-          <el-select v-model="searchForm.handleStatus" placeholder="選擇狀態" clearable style="width: 150px">
-            <el-option label="未處理" value="UNHANDLED" />
-            <el-option label="已處理" value="PROCESSED" />
+        <el-form-item label="处理状态">
+          <el-select v-model="searchForm.handleStatus" placeholder="选择状态" clearable style="width: 150px">
+            <el-option label="未处理" value="UNHANDLED" />
+            <el-option label="已处理" value="PROCESSED" />
             <el-option label="已忽略" value="IGNORED" />
           </el-select>
         </el-form-item>
-        <el-form-item label="預警級別">
-          <el-select v-model="searchForm.warnLevel" placeholder="選擇級別" clearable style="width: 150px">
+        <el-form-item label="预警级别">
+          <el-select v-model="searchForm.warnLevel" placeholder="选择级别" clearable style="width: 150px">
             <el-option label="低" value="LOW" />
             <el-option label="中" value="MEDIUM" />
             <el-option label="高" value="HIGH" />
-            <el-option label="緊急" value="URGENT" />
+            <el-option label="紧急" value="URGENT" />
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="handleSearch">搜尋</el-button>
+          <el-button type="primary" @click="handleSearch">搜寻</el-button>
           <el-button @click="resetSearch">重置</el-button>
         </el-form-item>
       </el-form>
@@ -32,29 +32,29 @@
     <el-card class="table-card" shadow="never">
       <el-table :data="tableData" style="width: 100%" v-loading="loading" border stripe>
         <el-table-column prop="id" label="ID" width="70" align="center" />
-        <el-table-column label="關聯設備" min-width="140">
+        <el-table-column label="关联设备" min-width="140">
           <template #default="{ row }">
             {{ getDeviceName(row.deviceId) }}
           </template>
         </el-table-column>
-        <el-table-column prop="warnLevel" label="級別" width="90" align="center">
+        <el-table-column prop="warnLevel" label="级别" width="90" align="center">
           <template #default="{ row }">
             <el-tag :type="levelTagType(row.warnLevel)" effect="dark">
               {{ levelText(row.warnLevel) }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="warnContent" label="預警內容" min-width="250" show-overflow-tooltip />
-        <el-table-column prop="warnTime" label="預警時間" width="160" align="center" />
+        <el-table-column prop="warnContent" label="预警内容" min-width="250" show-overflow-tooltip />
+        <el-table-column prop="warnTime" label="预警时间" width="160" align="center" />
         
-        <el-table-column prop="handleStatus" label="處理狀態" width="100" align="center">
+        <el-table-column prop="handleStatus" label="处理状态" width="100" align="center">
           <template #default="{ row }">
             <el-tag :type="statusTagType(row.handleStatus)">
               {{ statusText(row.handleStatus) }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="handleUser" label="處理人" width="100" align="center" />
+        <el-table-column prop="handleUser" label="处理人" width="100" align="center" />
         
         <el-table-column fixed="right" label="操作" width="120" align="center">
           <template #default="{ row }">
@@ -63,7 +63,7 @@
               link type="primary" size="small" 
               @click="openHandleDialog(row)"
             >
-              去處理
+              去处理
             </el-button>
             <el-button 
               v-else 
@@ -89,33 +89,33 @@
       </div>
     </el-card>
 
-    <el-dialog v-model="dialogVisible" :title="isViewOnly ? '預警處理詳情' : '處理預警'" width="500px" destroy-on-close>
+    <el-dialog v-model="dialogVisible" :title="isViewOnly ? '预警处理详情' : '处理预警'" width="500px" destroy-on-close>
       <el-form :model="handleForm" label-width="90px">
-        <el-form-item label="預警內容">
+        <el-form-item label="预警内容">
           <el-alert :title="currentWarn?.warnContent" :type="levelTagType(currentWarn?.warnLevel || 'LOW')" :closable="false" />
         </el-form-item>
-        <el-form-item label="預警時間">
+        <el-form-item label="预警时间">
           <span>{{ currentWarn?.warnTime }}</span>
         </el-form-item>
         
         <el-divider border-style="dashed" />
 
-        <el-form-item label="處理結果" required>
+        <el-form-item label="处理结果" required>
           <el-radio-group v-model="handleForm.handleStatus" :disabled="isViewOnly">
-            <el-radio value="PROCESSED">已處理</el-radio>
-            <el-radio value="IGNORED">忽略警報</el-radio>
+            <el-radio value="PROCESSED">已处理</el-radio>
+            <el-radio value="IGNORED">忽略警报</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="處理人" required>
-          <el-input v-model="handleForm.handleUser" :disabled="isViewOnly" placeholder="請輸入處理人姓名" />
+        <el-form-item label="处理人" required>
+          <el-input v-model="handleForm.handleUser" :disabled="isViewOnly" placeholder="请输入处理人姓名" />
         </el-form-item>
-        <el-form-item label="處理備註" :required="handleForm.handleStatus === 'PROCESSED'">
-          <el-input v-model="handleForm.handleRemark" type="textarea" :rows="3" :disabled="isViewOnly" placeholder="請填寫具體的排查或處理措施" />
+        <el-form-item label="处理备注" :required="handleForm.handleStatus === 'PROCESSED'">
+          <el-input v-model="handleForm.handleRemark" type="textarea" :rows="3" :disabled="isViewOnly" placeholder="请填写具体的排查或处理措施" />
         </el-form-item>
       </el-form>
       <template #footer v-if="!isViewOnly">
         <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="submitHandle" :loading="submitLoading">提交處理</el-button>
+        <el-button type="primary" @click="submitHandle" :loading="submitLoading">提交处理</el-button>
       </template>
     </el-dialog>
   </div>
@@ -156,13 +156,13 @@ const fetchDeviceOptions = async () => {
     const res: any = await getDeviceList({ page: 1, pageSize: 1000 })
     deviceOptions.value = res.records || res.list || []
   } catch (error) {
-    console.error('獲取設備選單失敗', error)
+    console.error('获取设备选单失败', error)
   }
 }
 
 const getDeviceName = (id: number) => {
   const device = deviceOptions.value.find(d => d.id === id)
-  return device ? device.deviceName : `未知設備(${id})`
+  return device ? device.deviceName : `未知设备(${id})`
 }
 
 const levelTagType = (level: string) => {
@@ -175,7 +175,7 @@ const levelText = (level: string) => {
   if (level === 'LOW') return '低'
   if (level === 'MEDIUM') return '中'
   if (level === 'HIGH') return '高'
-  if (level === 'URGENT') return '緊急'
+  if (level === 'URGENT') return '紧急'
   return level
 }
 
@@ -186,8 +186,8 @@ const statusTagType = (status: string) => {
 }
 
 const statusText = (status: string) => {
-  if (status === 'UNHANDLED') return '未處理'
-  if (status === 'PROCESSED') return '已處理'
+  if (status === 'UNHANDLED') return '未处理'
+  if (status === 'PROCESSED') return '已处理'
   return '已忽略'
 }
 
@@ -205,7 +205,7 @@ const fetchWarnList = async () => {
     tableData.value = result.records || result.list || []
     total.value = result.total || 0
   } catch (error) {
-    console.error('獲取預警列表失敗:', error)
+    console.error('获取预警列表失败:', error)
   } finally {
     loading.value = false
   }
@@ -225,7 +225,7 @@ const openHandleDialog = (row: WarnInfo, viewOnly = false) => {
   } else {
     handleForm.id = row.id
     handleForm.handleStatus = 'PROCESSED'
-    // 預設填入當前登入者名稱
+    // 预设填入当前登入者名称
     handleForm.handleUser = userStore.userInfo?.realName || userStore.userInfo?.username || ''
     handleForm.handleRemark = ''
   }
@@ -235,11 +235,11 @@ const openHandleDialog = (row: WarnInfo, viewOnly = false) => {
 
 const submitHandle = async () => {
   if (!handleForm.handleUser) {
-    ElMessage.warning('請填寫處理人')
+    ElMessage.warning('请填写处理人')
     return
   }
   if (handleForm.handleStatus === 'PROCESSED' && !handleForm.handleRemark) {
-    ElMessage.warning('標記為「已處理」時，請填寫處理備註')
+    ElMessage.warning('标记为「已处理」时，请填写处理备注')
     return
   }
   
@@ -250,11 +250,11 @@ const submitHandle = async () => {
       handleUser: handleForm.handleUser,
       handleRemark: handleForm.handleRemark
     })
-    ElMessage.success('處理提交成功')
+    ElMessage.success('处理提交成功')
     dialogVisible.value = false
     fetchWarnList()
   } catch (error) {
-    console.error('處理失敗:', error)
+    console.error('处理失败:', error)
   } finally {
     submitLoading.value = false
   }
