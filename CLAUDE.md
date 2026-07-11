@@ -101,6 +101,7 @@ medalter-guardian/
 | T8 | README.md 中版本号与实际 pom.xml / package.json / engines 持续同步 | 🟢 低 | ✅ | — |
 | T10 | 前端繁体中文统一转简体（OpenCC t2s，19 文件 948 字符）+ `lang="zh-CN"` + 简体字体栈 | 🟡 中 | ✅ | — |
 | T11 | 前端 UI 视觉优化/重构（清新医疗蓝绿主题、外壳/登录重构、数据仪表盘+ECharts、动效、页面头/空状态） | 🟡 中 | ✅ | T10 |
+| T12 | README.md 繁体转简体（OpenCC 字符级 + 两岸词汇手工修正 621 字符） | 🟢 低 | ✅ | T10 |
 
 ---
 
