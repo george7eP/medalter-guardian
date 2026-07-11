@@ -1,5 +1,6 @@
 <template>
   <div class="warn-handle-container">
+    <PageHeader title="预警处理" subtitle="预警事件跟踪与闭环处理" />
     <el-card class="search-card" shadow="never">
       <el-form :inline="true" :model="searchForm" class="search-form">
         <el-form-item label="关联设备">
@@ -122,6 +123,7 @@
 </template>
 
 <script setup lang="ts">
+import PageHeader from '@/components/common/PageHeader.vue'
 import { ref, reactive, onMounted } from "vue"
 import { ElMessage } from "element-plus"
 import { getWarnList, handleWarn } from "@/api/warn/handle"

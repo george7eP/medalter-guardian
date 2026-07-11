@@ -1,0 +1,194 @@
+/**
+ * 医疗设备守卫 — 清新医疗蓝绿主题
+ * 设计令牌 + Element Plus 变量覆盖。全局唯一样式源，务必在 element-plus 之后引入。
+ */
+
+:root {
+  /* —— 品牌色板（临床蓝绿） —— */
+  --mg-primary: #0FA3A3;         /* 主色·青绿 */
+  --mg-primary-strong: #0B8686;  /* 主色·加深（hover/active） */
+  --mg-primary-soft: #E4F4F4;    /* 主色·极浅（选中背景/标签） */
+  --mg-accent: #1E6FD9;          /* 强调·医疗蓝 */
+  --mg-accent-soft: #E7F0FC;
+
+  /* —— 中性 —— */
+  --mg-bg: #F6F9FB;              /* 应用底色 */
+  --mg-surface: #FFFFFF;         /* 卡片 */
+  --mg-surface-2: #EFF4F7;       /* 次级面板/表头 */
+  --mg-ink: #1B2A38;            /* 标题 */
+  --mg-text: #46586A;           /* 正文 */
+  --mg-muted: #8798A8;          /* 辅助文字 */
+  --mg-border: #E4EBF0;         /* 描边 */
+  --mg-border-strong: #D2DCE4;
+
+  /* —— 语义色 —— */
+  --mg-success: #16A34A;
+  --mg-warning: #E6A23C;
+  --mg-danger: #E5484D;
+  --mg-info: #1E6FD9;
+
+  /* —— 圆角 —— */
+  --mg-radius-sm: 8px;
+  --mg-radius: 12px;
+  --mg-radius-lg: 16px;
+
+  /* —— 阴影（柔和、低对比，医疗感） —— */
+  --mg-shadow-sm: 0 1px 2px rgba(27, 42, 56, .04), 0 1px 3px rgba(27, 42, 56, .06);
+  --mg-shadow: 0 2px 8px rgba(27, 42, 56, .05), 0 8px 24px rgba(27, 42, 56, .06);
+  --mg-shadow-lg: 0 12px 40px rgba(15, 163, 163, .12), 0 4px 12px rgba(27, 42, 56, .08);
+
+  /* —— 运动 —— */
+  --mg-ease: cubic-bezier(.4, 0, .2, 1);
+  --mg-dur-fast: 140ms;
+  --mg-dur: 240ms;
+  --mg-dur-slow: 420ms;
+
+  /* —— 布局尺度 —— */
+  --mg-header-h: 60px;
+  --mg-aside-w: 224px;
+
+  /* ============ Element Plus 变量覆盖 ============ */
+  --el-color-primary: var(--mg-primary);
+  --el-color-primary-dark-2: var(--mg-primary-strong);
+  --el-color-primary-light-3: #4FBDBD;
+  --el-color-primary-light-5: #87D2D2;
+  --el-color-primary-light-7: #BFE7E7;
+  --el-color-primary-light-8: #D6F0F0;
+  --el-color-primary-light-9: var(--mg-primary-soft);
+
+  --el-color-success: var(--mg-success);
+  --el-color-warning: var(--mg-warning);
+  --el-color-danger: var(--mg-danger);
+  --el-color-error: var(--mg-danger);
+  --el-color-info: var(--mg-muted);
+
+  --el-text-color-primary: var(--mg-ink);
+  --el-text-color-regular: var(--mg-text);
+  --el-text-color-secondary: var(--mg-muted);
+  --el-border-color: var(--mg-border);
+  --el-border-color-light: var(--mg-border);
+  --el-border-color-lighter: var(--mg-border);
+  --el-fill-color-blank: var(--mg-surface);
+  --el-bg-color: var(--mg-surface);
+  --el-bg-color-page: var(--mg-bg);
+
+  --el-border-radius-base: 10px;
+  --el-border-radius-small: 8px;
+
+  --el-font-family: "PingFang SC", "Microsoft YaHei", "微软雅黑",
+    "Hiragino Sans GB", "Source Han Sans SC", "Noto Sans SC",
+    "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+/* —— 基础排版 —— */
+body {
+  margin: 0;
+  color: var(--mg-text);
+  background: var(--mg-bg);
+  font-family: var(--el-font-family);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* —— 通用工具类 —— */
+.mg-card {
+  background: var(--mg-surface);
+  border: 1px solid var(--mg-border);
+  border-radius: var(--mg-radius);
+  box-shadow: var(--mg-shadow-sm);
+}
+
+/* 卡片悬浮抬升（用于可交互卡片） */
+.mg-hoverable {
+  transition: transform var(--mg-dur) var(--mg-ease),
+    box-shadow var(--mg-dur) var(--mg-ease);
+}
+.mg-hoverable:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--mg-shadow);
+}
+
+/* —— Element Plus 组件微调 —— */
+.el-button {
+  font-weight: 500;
+  transition: transform var(--mg-dur-fast) var(--mg-ease),
+    box-shadow var(--mg-dur-fast) var(--mg-ease),
+    background-color var(--mg-dur-fast) var(--mg-ease);
+}
+.el-button--primary {
+  box-shadow: 0 4px 12px rgba(15, 163, 163, .22);
+}
+.el-button:active {
+  transform: translateY(1px);
+}
+
+/* 表格：更轻的分割线 + 悬浮高亮 + 圆角容器 */
+.el-table {
+  --el-table-border-color: var(--mg-border);
+  --el-table-header-bg-color: var(--mg-surface-2);
+  --el-table-header-text-color: var(--mg-ink);
+  --el-table-row-hover-bg-color: var(--mg-primary-soft);
+}
+
+/* 卡片 hover 阴影 */
+.el-card {
+  border-radius: var(--mg-radius);
+  border-color: var(--mg-border);
+}
+
+/* 输入框圆润 */
+.el-input__wrapper,
+.el-textarea__inner {
+  border-radius: var(--mg-radius-sm);
+}
+
+/* 弹窗更柔和 */
+.el-dialog {
+  border-radius: var(--mg-radius-lg);
+  overflow: hidden;
+}
+.el-dialog__header {
+  margin-right: 0;
+  padding: 20px 24px 12px;
+  font-weight: 600;
+}
+
+/* —— 页面进入过渡 —— */
+.mg-fade-enter-active {
+  transition: opacity var(--mg-dur-slow) var(--mg-ease),
+    transform var(--mg-dur-slow) var(--mg-ease);
+}
+.mg-fade-enter-from {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+/* 逐项上浮（列表/卡片入场，配合 style 内联 delay） */
+@keyframes mg-rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.mg-rise {
+  animation: mg-rise var(--mg-dur-slow) var(--mg-ease) both;
+}
+
+/* —— 自定义滚动条 —— */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb {
+  background: var(--mg-border-strong);
+  border-radius: 999px;
+  border: 2px solid var(--mg-bg);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--mg-muted); }
+
+/* —— 尊重减少动效偏好 —— */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

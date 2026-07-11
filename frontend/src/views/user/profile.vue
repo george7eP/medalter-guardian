@@ -1,5 +1,6 @@
 <template>
   <div class="profile-container">
+    <PageHeader title="个人中心" subtitle="查看账号资料与安全设置" />
     <el-row :gutter="20">
       <el-col :span="10">
         <el-card class="box-card" shadow="never" v-loading="loading">
@@ -58,6 +59,7 @@
 </template>
 
 <script setup lang="ts">
+import PageHeader from '@/components/common/PageHeader.vue'
 import { ref, onMounted, reactive } from "vue"
 import { ElMessage } from "element-plus"
 import { getCurrentUser, updateUser } from "@/api/user"

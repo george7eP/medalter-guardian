@@ -1,5 +1,6 @@
 <template>
   <div class="device-container">
+    <PageHeader title="设备管理" subtitle="医疗设备台账与运行状态维护" />
     <el-card class="search-card" shadow="never">
       <el-form :inline="true" :model="searchForm" class="search-form">
         <el-form-item label="设备名称">
@@ -132,6 +133,7 @@
 </template>
 
 <script setup lang="ts">
+import PageHeader from '@/components/common/PageHeader.vue'
 import { ref, reactive, onMounted } from "vue"
 import { ElMessage, ElMessageBox } from "element-plus"
 import { getDeviceList, createDevice, updateDevice, deleteDevice } from "@/api/device"

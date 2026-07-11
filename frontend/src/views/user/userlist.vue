@@ -1,5 +1,6 @@
 <template>
   <div class="user-container">
+    <PageHeader title="用户管理" subtitle="系统用户账号管理" />
     <el-card class="search-card" shadow="never">
       <el-form :inline="true" :model="searchForm" class="search-form">
         <el-form-item label="使用者名称">
@@ -116,6 +117,7 @@
 </template>
 
 <script setup lang="ts">
+import PageHeader from '@/components/common/PageHeader.vue'
 import { ref, reactive, onMounted } from "vue"
 import { ElMessage, ElMessageBox } from "element-plus"
 import { getUserList, deleteUser, createUser, updateUser, getUserRoleIds, assignUserRoles } from "@/api/user"

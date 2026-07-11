@@ -1,5 +1,6 @@
 <template>
   <div class="rule-container">
+    <PageHeader title="预警规则" subtitle="设备到期与状态预警规则配置" />
     <el-card class="search-card" shadow="never">
       <el-form :inline="true" :model="searchForm" class="search-form">
         <el-form-item label="关联设备">
@@ -128,6 +129,7 @@
 </template>
 
 <script setup lang="ts">
+import PageHeader from '@/components/common/PageHeader.vue'
 import { ref, reactive, onMounted } from "vue"
 import { ElMessage, ElMessageBox } from "element-plus"
 import { getRuleList, createRule, updateRule, deleteRule } from "@/api/warn/rule"

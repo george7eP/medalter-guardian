@@ -14,8 +14,13 @@ const router = createRouter({
       path: '/',
       name: 'main',
       component: () => import('@/views/main.vue'),
-      redirect: '/device', // ✨ 关键修复：把登入后的预设首页改成 /device，不要再预设跳到敏感的 /user
+      redirect: '/dashboard', // 登入后默认进入数据概览（无需特定权限，所有登录用户可见）
       children: [
+        {
+          path: '/dashboard',
+          name: 'dashboard',
+          component: () => import('@/views/dashboard/index.vue'),
+        },
         {
           path: '/user',
           name: 'user',
@@ -89,10 +94,9 @@ router.beforeEach((to, from, next) => {
       // 检查即将前往的路由是否需要特定权限
       if (to.meta.permission && !userStore.hasPermission(to.meta.permission as string)) {
         ElMessage.error('拒绝访问：您没有权限进入此页面')
-        // 如果没有权限，踢回上一个页面或设备管理首页
-        // 如果没有权限，踢回上一个页面或设备管理首页
+        // 无权限时退回来源页；首次进入则回到数据概览（所有登录用户可访问）
         if (from.path === '/') {
-          next('/device')
+          next('/dashboard')
         } else {
           next(false)
         }
