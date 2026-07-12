@@ -27,6 +27,31 @@
   --mg-danger: #E5484D;
   --mg-info: #1E6FD9;
 
+  /* —— 语气色块（统计图标底/前景，深色下有对应覆盖） —— */
+  --mg-tone-teal-bg: #E4F4F4;  --mg-tone-teal-fg: #0FA3A3;
+  --mg-tone-amber-bg: #FCF0DC; --mg-tone-amber-fg: #E6A23C;
+  --mg-tone-red-bg: #FBE3E4;   --mg-tone-red-fg: #E5484D;
+  --mg-tone-green-bg: #E1F3E8; --mg-tone-green-fg: #16A34A;
+
+  /* —— 字号阶梯（模块化 · 医疗 UI 稳重清晰） —— */
+  --mg-fs-caption: 12px;   /* 辅助/时间戳 */
+  --mg-fs-sm: 13px;        /* 次要正文/标签 */
+  --mg-fs-body: 14px;      /* 正文基准 */
+  --mg-fs-md: 15px;        /* 面板标题 */
+  --mg-fs-lg: 17px;        /* 小节标题 */
+  --mg-fs-xl: 21px;        /* 页面标题 */
+  --mg-fs-2xl: 26px;       /* 强调数字 */
+  --mg-fs-display: 32px;   /* 指标大数 */
+
+  /* —— 间距节奏（4px 基线） —— */
+  --mg-sp-1: 4px;
+  --mg-sp-2: 8px;
+  --mg-sp-3: 12px;
+  --mg-sp-4: 16px;
+  --mg-sp-5: 20px;
+  --mg-sp-6: 24px;
+  --mg-sp-8: 32px;
+
   /* —— 圆角 —— */
   --mg-radius-sm: 8px;
   --mg-radius: 12px;
@@ -80,6 +105,72 @@
     "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
+/* ============================================================
+   深色主题（清临床蓝绿 · 深色版）
+   仅重定义 --mg-* 令牌 + 重申关键 --el-* 映射，
+   引入顺序在 element-plus 暗色 css-vars 之后，故本表优先生效。
+   ============================================================ */
+html.dark {
+  /* —— 品牌色（深底上略提亮以保证对比） —— */
+  --mg-primary: #2DB6B6;
+  --mg-primary-strong: #4FC7C7;
+  --mg-primary-soft: rgba(45, 182, 182, .15);
+  --mg-accent: #4B93E6;
+  --mg-accent-soft: rgba(75, 147, 230, .16);
+
+  /* —— 中性 —— */
+  --mg-bg: #0E1620;
+  --mg-surface: #16212E;
+  --mg-surface-2: #1E2B3A;
+  --mg-ink: #EAF1F6;
+  --mg-text: #B4C2CE;
+  --mg-muted: #7E8FA0;
+  --mg-border: #26333F;
+  --mg-border-strong: #33424F;
+
+  /* —— 语义色（深底提亮） —— */
+  --mg-success: #2FB56A;
+  --mg-warning: #E7A93E;
+  --mg-danger: #F26468;
+  --mg-info: #4B93E6;
+
+  /* —— 语气色块 —— */
+  --mg-tone-teal-bg: rgba(45, 182, 182, .16);  --mg-tone-teal-fg: #4FC7C7;
+  --mg-tone-amber-bg: rgba(231, 169, 62, .16); --mg-tone-amber-fg: #E7A93E;
+  --mg-tone-red-bg: rgba(242, 100, 104, .16);  --mg-tone-red-fg: #F26468;
+  --mg-tone-green-bg: rgba(47, 181, 106, .16); --mg-tone-green-fg: #2FB56A;
+
+  /* —— 阴影（深色下加深、降低泛光） —— */
+  --mg-shadow-sm: 0 1px 2px rgba(0, 0, 0, .28), 0 1px 3px rgba(0, 0, 0, .36);
+  --mg-shadow: 0 2px 8px rgba(0, 0, 0, .30), 0 8px 24px rgba(0, 0, 0, .34);
+  --mg-shadow-lg: 0 12px 40px rgba(0, 0, 0, .46), 0 4px 12px rgba(0, 0, 0, .38);
+
+  /* —— 重申 Element Plus 关键映射（覆盖官方暗色默认灰） —— */
+  --el-color-primary: var(--mg-primary);
+  --el-color-primary-light-3: #3FBFBF;
+  --el-color-primary-light-5: #6BCECE;
+  --el-color-primary-light-7: #99DCDC;
+  --el-color-primary-light-8: #B6E4E4;
+  --el-color-primary-light-9: var(--mg-primary-soft);
+  --el-color-success: var(--mg-success);
+  --el-color-warning: var(--mg-warning);
+  --el-color-danger: var(--mg-danger);
+  --el-color-error: var(--mg-danger);
+  --el-color-info: var(--mg-muted);
+
+  --el-text-color-primary: var(--mg-ink);
+  --el-text-color-regular: var(--mg-text);
+  --el-text-color-secondary: var(--mg-muted);
+  --el-border-color: var(--mg-border);
+  --el-border-color-light: var(--mg-border);
+  --el-border-color-lighter: var(--mg-border);
+  --el-fill-color-blank: var(--mg-surface);
+  --el-bg-color: var(--mg-surface);
+  --el-bg-color-overlay: var(--mg-surface);
+  --el-bg-color-page: var(--mg-bg);
+  --el-mask-color: rgba(14, 22, 32, .7);
+}
+
 /* —— 基础排版 —— */
 body {
   margin: 0;
@@ -88,6 +179,21 @@ body {
   font-family: var(--el-font-family);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* 主题切换时，面板/文字/描边平滑过渡（reduced-motion 下自动禁用） */
+body,
+.mg-card,
+.el-card,
+.el-header,
+.el-aside,
+.el-main,
+.el-table,
+.el-table th.el-table__cell,
+.el-table tr {
+  transition: background-color var(--mg-dur) var(--mg-ease),
+    border-color var(--mg-dur) var(--mg-ease),
+    color var(--mg-dur) var(--mg-ease);
 }
 
 /* —— 通用工具类 —— */

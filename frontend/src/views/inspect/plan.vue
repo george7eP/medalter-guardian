@@ -38,8 +38,8 @@
         <el-table-column prop="principal" label="负责人" width="120" align="center" />
         <el-table-column prop="planStatus" label="状态" width="100" align="center">
           <template #default="{ row }">
-            <el-tag :type="row.planStatus === 'COMPLETED' ? 'success' : 'warning'">
-              {{ row.planStatus === 'COMPLETED' ? '已完成' : '待执行' }}
+            <el-tag :type="enumTag(PLAN_STATUS, row.planStatus)" round>
+              {{ enumLabel(PLAN_STATUS, row.planStatus) }}
             </el-tag>
           </template>
         </el-table-column>
@@ -106,6 +106,7 @@ import { getPlanList, createPlan, updatePlan, deletePlan } from "@/api/inspect/p
 import type { InspectPlan } from "@/api/inspect/plan"
 import { getDeviceList } from "@/api/device" // 引入设备 API 以获取下拉选单
 import type { DeviceInfo } from "@/api/device"
+import { PLAN_STATUS, enumTag, enumLabel } from "@/constants/enums"
 
 const tableData = ref<InspectPlan[]>([])
 const deviceOptions = ref<DeviceInfo[]>([]) // 存放设备清单

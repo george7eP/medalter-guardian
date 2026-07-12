@@ -40,8 +40,8 @@
         </el-table-column>
         <el-table-column prop="warnLevel" label="级别" width="90" align="center">
           <template #default="{ row }">
-            <el-tag :type="levelTagType(row.warnLevel)" effect="dark">
-              {{ levelText(row.warnLevel) }}
+            <el-tag :type="enumTag(WARN_LEVEL, row.warnLevel)" effect="dark" round>
+              {{ enumLabel(WARN_LEVEL, row.warnLevel) }}
             </el-tag>
           </template>
         </el-table-column>
@@ -50,8 +50,8 @@
         
         <el-table-column prop="handleStatus" label="处理状态" width="100" align="center">
           <template #default="{ row }">
-            <el-tag :type="statusTagType(row.handleStatus)">
-              {{ statusText(row.handleStatus) }}
+            <el-tag :type="enumTag(HANDLE_STATUS, row.handleStatus)" round>
+              {{ enumLabel(HANDLE_STATUS, row.handleStatus) }}
             </el-tag>
           </template>
         </el-table-column>
@@ -90,53 +90,28 @@
       </div>
     </el-card>
 
-    <el-dialog v-model="dialogVisible" :title="isViewOnly ? '预警处理详情' : '处理预警'" width="500px" destroy-on-close>
-      <el-form :model="handleForm" label-width="90px">
-        <el-form-item label="预警内容">
-          <el-alert :title="currentWarn?.warnContent" :type="levelTagType(currentWarn?.warnLevel || 'LOW')" :closable="false" />
-        </el-form-item>
-        <el-form-item label="预警时间">
-          <span>{{ currentWarn?.warnTime }}</span>
-        </el-form-item>
-        
-        <el-divider border-style="dashed" />
-
-        <el-form-item label="处理结果" required>
-          <el-radio-group v-model="handleForm.handleStatus" :disabled="isViewOnly">
-            <el-radio value="PROCESSED">已处理</el-radio>
-            <el-radio value="IGNORED">忽略警报</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="处理人" required>
-          <el-input v-model="handleForm.handleUser" :disabled="isViewOnly" placeholder="请输入处理人姓名" />
-        </el-form-item>
-        <el-form-item label="处理备注" :required="handleForm.handleStatus === 'PROCESSED'">
-          <el-input v-model="handleForm.handleRemark" type="textarea" :rows="3" :disabled="isViewOnly" placeholder="请填写具体的排查或处理措施" />
-        </el-form-item>
-      </el-form>
-      <template #footer v-if="!isViewOnly">
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="submitHandle" :loading="submitLoading">提交处理</el-button>
-      </template>
-    </el-dialog>
+    <WarnHandleDialog
+      v-model="dialogVisible"
+      :warn="currentWarn"
+      :view-only="isViewOnly"
+      @handled="fetchWarnList"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import PageHeader from '@/components/common/PageHeader.vue'
+import WarnHandleDialog from '@/components/warn/WarnHandleDialog.vue'
 import { ref, reactive, onMounted } from "vue"
-import { ElMessage } from "element-plus"
-import { getWarnList, handleWarn } from "@/api/warn/handle"
+import { getWarnList } from "@/api/warn/handle"
 import type { WarnInfo } from "@/api/warn/handle"
-import { getDeviceList } from "@/api/device" 
+import { getDeviceList } from "@/api/device"
 import type { DeviceInfo } from "@/api/device"
-import { useUserStore } from '@/stores/users'
+import { WARN_LEVEL, HANDLE_STATUS, enumTag, enumLabel } from "@/constants/enums"
 
-const userStore = useUserStore()
 const tableData = ref<WarnInfo[]>([])
-const deviceOptions = ref<DeviceInfo[]>([]) 
+const deviceOptions = ref<DeviceInfo[]>([])
 const loading = ref(false)
-const submitLoading = ref(false)
 const total = ref(0)
 
 const dialogVisible = ref(false)
@@ -145,13 +120,6 @@ const currentWarn = ref<WarnInfo | null>(null)
 
 const searchForm = reactive({ deviceId: undefined as number | undefined, warnLevel: '', handleStatus: '' })
 const pageParams = reactive({ page: 1, pageSize: 10 })
-
-const handleForm = reactive({
-  id: undefined as number | undefined,
-  handleStatus: 'PROCESSED' as 'PROCESSED' | 'IGNORED',
-  handleUser: '',
-  handleRemark: ''
-})
 
 const fetchDeviceOptions = async () => {
   try {
@@ -165,32 +133,6 @@ const fetchDeviceOptions = async () => {
 const getDeviceName = (id: number) => {
   const device = deviceOptions.value.find(d => d.id === id)
   return device ? device.deviceName : `未知设备(${id})`
-}
-
-const levelTagType = (level: string) => {
-  if (level === 'LOW') return 'info'
-  if (level === 'MEDIUM') return 'warning'
-  return 'danger' // HIGH, URGENT
-}
-
-const levelText = (level: string) => {
-  if (level === 'LOW') return '低'
-  if (level === 'MEDIUM') return '中'
-  if (level === 'HIGH') return '高'
-  if (level === 'URGENT') return '紧急'
-  return level
-}
-
-const statusTagType = (status: string) => {
-  if (status === 'UNHANDLED') return 'danger'
-  if (status === 'PROCESSED') return 'success'
-  return 'info' // IGNORED
-}
-
-const statusText = (status: string) => {
-  if (status === 'UNHANDLED') return '未处理'
-  if (status === 'PROCESSED') return '已处理'
-  return '已忽略'
 }
 
 const fetchWarnList = async () => {
@@ -219,47 +161,7 @@ const resetSearch = () => { searchForm.deviceId = undefined; searchForm.warnLeve
 const openHandleDialog = (row: WarnInfo, viewOnly = false) => {
   isViewOnly.value = viewOnly
   currentWarn.value = row
-  
-  if (viewOnly) {
-    handleForm.handleStatus = row.handleStatus as any
-    handleForm.handleUser = row.handleUser || ''
-    handleForm.handleRemark = row.handleRemark || ''
-  } else {
-    handleForm.id = row.id
-    handleForm.handleStatus = 'PROCESSED'
-    // 预设填入当前登入者名称
-    handleForm.handleUser = userStore.userInfo?.realName || userStore.userInfo?.username || ''
-    handleForm.handleRemark = ''
-  }
-  
   dialogVisible.value = true
-}
-
-const submitHandle = async () => {
-  if (!handleForm.handleUser) {
-    ElMessage.warning('请填写处理人')
-    return
-  }
-  if (handleForm.handleStatus === 'PROCESSED' && !handleForm.handleRemark) {
-    ElMessage.warning('标记为「已处理」时，请填写处理备注')
-    return
-  }
-  
-  submitLoading.value = true
-  try {
-    await handleWarn(handleForm.id!, {
-      handleStatus: handleForm.handleStatus,
-      handleUser: handleForm.handleUser,
-      handleRemark: handleForm.handleRemark
-    })
-    ElMessage.success('处理提交成功')
-    dialogVisible.value = false
-    fetchWarnList()
-  } catch (error) {
-    console.error('处理失败:', error)
-  } finally {
-    submitLoading.value = false
-  }
 }
 
 onMounted(() => {

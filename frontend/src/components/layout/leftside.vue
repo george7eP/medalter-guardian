@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, ref, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/users'
 import {
   Odometer,
@@ -14,6 +14,7 @@ import {
 } from '@element-plus/icons-vue'
 
 const router = useRouter()
+const route = useRoute()
 const userStore = useUserStore()
 
 const activeMenu = ref('')
@@ -181,7 +182,12 @@ function findMenuItemByPath(menu: any[], path: string): any {
   return null
 }
 
-activeMenu.value = getDefaultActive()
+// 高亮跟随当前路由：涵盖菜单点击、programmatic 导航（如仪表盘「查看全部」）、浏览器前进后退
+watch(
+  () => route.path,
+  () => { activeMenu.value = getDefaultActive() },
+  { immediate: true },
+)
 </script>
 
 <template>

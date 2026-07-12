@@ -32,8 +32,8 @@
         <el-table-column prop="email" label="电子信箱" min-width="180" show-overflow-tooltip />
         <el-table-column prop="status" label="状态" width="100" align="center">
           <template #default="{ row }">
-            <el-tag :type="row.status === 1 ? 'success' : 'danger'">
-              {{ row.status === 1 ? '正常' : '停用' }}
+            <el-tag :type="enumTag(USER_STATUS, row.status)" round>
+              {{ enumLabel(USER_STATUS, row.status) }}
             </el-tag>
           </template>
         </el-table-column>
@@ -123,6 +123,7 @@ import { ElMessage, ElMessageBox } from "element-plus"
 import { getUserList, deleteUser, createUser, updateUser, getUserRoleIds, assignUserRoles } from "@/api/user"
 import type { UserInfo, UserForm } from "@/api/user"
 import { getRoleList } from "@/api/system/role"
+import { USER_STATUS, enumTag, enumLabel } from "@/constants/enums"
 
 const tableData = ref<UserInfo[]>([])
 const loading = ref(false)

@@ -36,10 +36,10 @@
         </el-table-column>
         <el-table-column prop="inspectDate" label="检修日期" width="120" align="center" />
         <el-table-column prop="inspectContent" label="检修内容" min-width="200" show-overflow-tooltip />
-        <el-table-column prop="inspectResult" label="检修结果" width="100" align="center">
+        <el-table-column prop="inspectResult" label="检修结果" width="110" align="center">
           <template #default="{ row }">
-            <el-tag :type="resultTagType(row.inspectResult)">
-              {{ resultText(row.inspectResult) }}
+            <el-tag :type="enumTag(INSPECT_RESULT, row.inspectResult)" round>
+              {{ enumLabel(INSPECT_RESULT, row.inspectResult) }}
             </el-tag>
           </template>
         </el-table-column>
@@ -125,8 +125,9 @@ import { ref, reactive, onMounted } from "vue"
 import { ElMessage, ElMessageBox } from "element-plus"
 import { getRecordList, createRecord, updateRecord, deleteRecord } from "@/api/inspect/record"
 import type { InspectRecord } from "@/api/inspect/record"
-import { getDeviceList } from "@/api/device" 
+import { getDeviceList } from "@/api/device"
 import type { DeviceInfo } from "@/api/device"
+import { INSPECT_RESULT, enumTag, enumLabel } from "@/constants/enums"
 
 const tableData = ref<InspectRecord[]>([])
 const deviceOptions = ref<DeviceInfo[]>([]) 
@@ -164,18 +165,6 @@ const fetchDeviceOptions = async () => {
 const getDeviceName = (id: number) => {
   const device = deviceOptions.value.find(d => d.id === id)
   return device ? device.deviceName : `未知设备(${id})`
-}
-
-const resultTagType = (result: string) => {
-  if (result === 'PASS') return 'success'
-  if (result === 'PARTIAL') return 'warning'
-  return 'danger'
-}
-
-const resultText = (result: string) => {
-  if (result === 'PASS') return '合格'
-  if (result === 'PARTIAL') return '部分合格'
-  return '不合格'
 }
 
 const fetchRecordList = async () => {
