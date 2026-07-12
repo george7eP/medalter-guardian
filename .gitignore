@@ -9,3 +9,6 @@ Thumbs.db
 
 # Claude
 .claude/
+
+# Transient dev-server logs
+*-run.log

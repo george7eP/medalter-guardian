@@ -26,22 +26,24 @@
       </div>
 
       <el-table :data="tableData" style="width: 100%" v-loading="loading" border stripe>
-        <el-table-column prop="id" label="ID" width="70" align="center" />
+        <el-table-column prop="id" label="ID" width="64" align="center" />
         <el-table-column prop="deviceName" label="设备名称" min-width="130" show-overflow-tooltip />
-        <el-table-column prop="deviceModel" label="型号" width="110" />
-        <el-table-column prop="useDepartment" label="使用科室" width="120" align="center" />
-        <el-table-column prop="manufacturer" label="生产厂家" min-width="120" show-overflow-tooltip />
-        <el-table-column prop="purchaseDate" label="购买日期" width="120" align="center" />
-        <el-table-column prop="inspectCycle" label="检修周期(天)" width="110" align="center" />
-        <el-table-column prop="deviceStatus" label="状态" width="100" align="center">
+        <el-table-column prop="deviceStatus" label="状态" width="90" align="center">
           <template #default="{ row }">
-            <el-tag :type="statusTagType(row.deviceStatus)">
-              {{ statusText(row.deviceStatus) }}
+            <el-tag :type="enumTag(DEVICE_STATUS, row.deviceStatus)" effect="light" round>
+              {{ enumLabel(DEVICE_STATUS, row.deviceStatus) }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="lastInspectDate" label="上次检修日期" width="120" align="center" />
-        <el-table-column fixed="right" label="操作" width="150" align="center">
+        <el-table-column prop="deviceModel" label="型号" width="100" show-overflow-tooltip />
+        <el-table-column prop="useDepartment" label="使用科室" width="100" align="center" />
+        <el-table-column prop="manufacturer" label="生产厂家" min-width="110" show-overflow-tooltip />
+        <el-table-column prop="inspectCycle" label="检修周期" width="90" align="center">
+          <template #default="{ row }">{{ row.inspectCycle }} 天</template>
+        </el-table-column>
+        <el-table-column prop="purchaseDate" label="购买日期" width="112" align="center" />
+        <el-table-column prop="lastInspectDate" label="上次检修" width="112" align="center" />
+        <el-table-column fixed="right" label="操作" width="130" align="center">
           <template #default="{ row }">
             <el-button link type="primary" size="small" @click="handleEdit(row)">编辑</el-button>
             <el-button link type="danger" size="small" @click="handleDelete(row)">删除</el-button>
@@ -138,6 +140,7 @@ import { ref, reactive, onMounted } from "vue"
 import { ElMessage, ElMessageBox } from "element-plus"
 import { getDeviceList, createDevice, updateDevice, deleteDevice } from "@/api/device"
 import type { DeviceInfo } from "@/api/device"
+import { DEVICE_STATUS, enumTag, enumLabel } from "@/constants/enums"
 
 const tableData = ref<DeviceInfo[]>([])
 const loading = ref(false)
@@ -183,18 +186,6 @@ const fetchDeviceList = async () => {
 
 const handleSearch = () => { pageParams.page = 1; fetchDeviceList() }
 const resetSearch = () => { searchForm.deviceName = ''; searchForm.deviceStatus = ''; handleSearch() }
-
-const statusTagType = (status: string) => {
-  if (status === 'NORMAL') return 'success'
-  if (status === 'WARN') return 'warning'
-  return 'danger'
-}
-
-const statusText = (status: string) => {
-  if (status === 'NORMAL') return '正常'
-  if (status === 'WARN') return '预警'
-  return '故障'
-}
 
 const handleAdd = () => {
   isEdit.value = false

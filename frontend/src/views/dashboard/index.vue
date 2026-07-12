@@ -5,11 +5,40 @@ import {
   Monitor, Bell, Warning, CircleCheckFilled, Refresh, TrendCharts,
 } from '@element-plus/icons-vue'
 import PageHeader from '@/components/common/PageHeader.vue'
+import HeroVitals from '@/components/dashboard/HeroVitals.vue'
 import BaseChart from '@/components/charts/BaseChart.vue'
+import WarnHandleDialog from '@/components/warn/WarnHandleDialog.vue'
 import { getDeviceList, type DeviceInfo } from '@/api/device'
 import { getWarnList, type WarnInfo } from '@/api/warn/handle'
+import { useThemeStore } from '@/stores/theme'
+import { WARN_LEVEL, enumTag, enumLabel } from '@/constants/enums'
 
 const router = useRouter()
+const themeStore = useThemeStore()
+
+/* —— 图表配色（随主题切换，light/dark 各一套） —— */
+const chartTokens = computed(() => themeStore.resolved === 'dark'
+  ? {
+      ink: '#EAF1F6', axisLine: '#33424F', axisLabel: '#7E8FA0', split: '#212E3B',
+      legend: '#B4C2CE', pieBorder: '#16212E',
+      primary: '#2DB6B6', area1: 'rgba(45,182,182,.26)', area2: 'rgba(45,182,182,.02)',
+      success: '#2FB56A', warning: '#E7A93E', danger: '#F26468',
+      tooltipBg: '#1E2B3A', tooltipBorder: '#33424F', tooltipText: '#EAF1F6',
+    }
+  : {
+      ink: '#1B2A38', axisLine: '#E4EBF0', axisLabel: '#8798A8', split: '#EEF3F6',
+      legend: '#46586A', pieBorder: '#FFFFFF',
+      primary: '#0FA3A3', area1: 'rgba(15,163,163,.28)', area2: 'rgba(15,163,163,.02)',
+      success: '#16A34A', warning: '#E6A23C', danger: '#E5484D',
+      tooltipBg: '#FFFFFF', tooltipBorder: '#E4EBF0', tooltipText: '#1B2A38',
+    })
+
+/** 主题感知的 tooltip 样式，供各图表复用 */
+const themedTooltip = computed(() => ({
+  backgroundColor: chartTokens.value.tooltipBg,
+  borderColor: chartTokens.value.tooltipBorder,
+  textStyle: { color: chartTokens.value.tooltipText },
+}))
 
 const loading = ref(false)
 const devices = ref<DeviceInfo[]>([])
@@ -85,30 +114,31 @@ const trendOption = computed(() => {
     return `${t.getFullYear()}-${t.getMonth() + 1}` === b.key
   }).length)
 
+  const t = chartTokens.value
   return {
     grid: { top: 24, right: 18, bottom: 30, left: 40 },
-    tooltip: { trigger: 'axis' },
+    tooltip: { trigger: 'axis', ...themedTooltip.value },
     xAxis: {
       type: 'category', data: buckets.map(b => b.label),
       boundaryGap: false,
-      axisLine: { lineStyle: { color: '#E4EBF0' } },
-      axisLabel: { color: '#8798A8' },
+      axisLine: { lineStyle: { color: t.axisLine } },
+      axisLabel: { color: t.axisLabel },
     },
     yAxis: {
       type: 'value', minInterval: 1,
-      splitLine: { lineStyle: { color: '#EEF3F6' } },
-      axisLabel: { color: '#8798A8' },
+      splitLine: { lineStyle: { color: t.split } },
+      axisLabel: { color: t.axisLabel },
     },
     series: [{
       type: 'line', data: counts, smooth: true, symbolSize: 7,
-      lineStyle: { width: 3, color: '#0FA3A3' },
-      itemStyle: { color: '#0FA3A3', borderColor: '#fff', borderWidth: 2 },
+      lineStyle: { width: 3, color: t.primary },
+      itemStyle: { color: t.primary, borderColor: t.pieBorder, borderWidth: 2 },
       areaStyle: {
         color: {
           type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
           colorStops: [
-            { offset: 0, color: 'rgba(15,163,163,.28)' },
-            { offset: 1, color: 'rgba(15,163,163,.02)' },
+            { offset: 0, color: t.area1 },
+            { offset: 1, color: t.area2 },
           ],
         },
       },
@@ -118,18 +148,27 @@ const trendOption = computed(() => {
 
 const statusOption = computed(() => {
   const c = statusCount.value
+  const t = chartTokens.value
   const data = [
-    { value: c.NORMAL || 0, name: '正常', itemStyle: { color: '#16A34A' } },
-    { value: c.WARN || 0, name: '预警', itemStyle: { color: '#E6A23C' } },
-    { value: c.FAULT || 0, name: '故障', itemStyle: { color: '#E5484D' } },
+    { value: c.NORMAL || 0, name: '正常', itemStyle: { color: t.success } },
+    { value: c.WARN || 0, name: '预警', itemStyle: { color: t.warning } },
+    { value: c.FAULT || 0, name: '故障', itemStyle: { color: t.danger } },
   ]
   return {
-    tooltip: { trigger: 'item', formatter: '{b}: {c} 台 ({d}%)' },
-    legend: { bottom: 0, icon: 'circle', textStyle: { color: '#46586A' } },
+    tooltip: { trigger: 'item', formatter: '{b}: {c} 台 ({d}%)', ...themedTooltip.value },
+    legend: { bottom: 0, icon: 'circle', textStyle: { color: t.legend } },
+    // 环心显示设备总数
+    title: {
+      text: String(deviceTotal.value),
+      subtext: '设备总数',
+      left: 'center', top: '34%',
+      textStyle: { fontSize: 30, fontWeight: 700, color: t.ink },
+      subtextStyle: { fontSize: 12, color: t.axisLabel },
+    },
     series: [{
       type: 'pie', radius: ['52%', '72%'], center: ['50%', '44%'],
       avoidLabelOverlap: false,
-      itemStyle: { borderColor: '#fff', borderWidth: 3, borderRadius: 6 },
+      itemStyle: { borderColor: t.pieBorder, borderWidth: 3, borderRadius: 6 },
       label: { show: false },
       data,
     }],
@@ -139,18 +178,19 @@ const statusOption = computed(() => {
 const levelOption = computed(() => {
   const order = ['LOW', 'MEDIUM', 'HIGH', 'URGENT']
   const counts = order.map(k => warns.value.filter(w => w.warnLevel === k).length)
+  const t = chartTokens.value
   return {
     grid: { top: 24, right: 18, bottom: 30, left: 40 },
-    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, ...themedTooltip.value },
     xAxis: {
       type: 'category', data: order.map(k => levelMeta[k]?.name ?? k),
-      axisLine: { lineStyle: { color: '#E4EBF0' } },
-      axisLabel: { color: '#8798A8' },
+      axisLine: { lineStyle: { color: t.axisLine } },
+      axisLabel: { color: t.axisLabel },
     },
     yAxis: {
       type: 'value', minInterval: 1,
-      splitLine: { lineStyle: { color: '#EEF3F6' } },
-      axisLabel: { color: '#8798A8' },
+      splitLine: { lineStyle: { color: t.split } },
+      axisLabel: { color: t.axisLabel },
     },
     series: [{
       type: 'bar', data: counts.map((v, i) => ({
@@ -173,12 +213,16 @@ const recentWarns = computed(() =>
     .sort((a, b) => (b.warnTime || '').localeCompare(a.warnTime || ''))
     .slice(0, 6))
 
-const tagType: Record<string, string> = {
-  LOW: 'success', MEDIUM: 'warning', HIGH: 'warning', URGENT: 'danger',
-}
-
 function fmtTime(t?: string) {
   return t ? t.replace('T', ' ').slice(5, 16) : '—'
+}
+
+/* —— 一键处理 —— */
+const handleDialogVisible = ref(false)
+const handlingWarn = ref<WarnInfo | null>(null)
+function openHandle(w: WarnInfo) {
+  handlingWarn.value = w
+  handleDialogVisible.value = true
 }
 </script>
 
@@ -190,11 +234,21 @@ function fmtTime(t?: string) {
       </template>
     </PageHeader>
 
+    <!-- 运行体征（监护仪式脉搏 · 页面签名元素） -->
+    <HeroVitals
+      class="mg-rise"
+      :device-total="deviceTotal"
+      :normal-rate="normalRate"
+      :fault-count="faultCount"
+      :pending-warns="pendingWarns"
+    />
+
     <!-- 指标卡 -->
     <section class="stat-grid">
       <div
         v-for="(s, i) in stats" :key="s.key"
         class="stat-card mg-card mg-hoverable mg-rise"
+        :class="'tone-card-' + s.tone"
         :style="{ animationDelay: 70 * i + 'ms' }"
       >
         <span class="stat-icon" :class="'tone-' + s.tone">
@@ -237,8 +291,8 @@ function fmtTime(t?: string) {
         </div>
         <div v-if="recentWarns.length" class="recent-list">
           <div v-for="w in recentWarns" :key="w.id" class="recent-item">
-            <el-tag :type="(tagType[w.warnLevel] as any)" size="small" effect="light" round>
-              {{ levelMeta[w.warnLevel]?.name || w.warnLevel }}
+            <el-tag :type="enumTag(WARN_LEVEL, w.warnLevel)" size="small" effect="light" round>
+              {{ enumLabel(WARN_LEVEL, w.warnLevel) }}
             </el-tag>
             <div class="recent-main">
               <span class="recent-title">{{ w.warnContent }}</span>
@@ -246,14 +300,20 @@ function fmtTime(t?: string) {
                 {{ deviceNameMap[w.deviceId] || '设备#' + w.deviceId }} · {{ fmtTime(w.warnTime) }}
               </span>
             </div>
-            <span class="recent-status" :class="w.handleStatus === 'UNHANDLED' ? 'is-pending' : ''">
-              {{ w.handleStatus === 'UNHANDLED' ? '待处理' : '已处理' }}
-            </span>
+            <el-button
+              v-if="w.handleStatus === 'UNHANDLED'"
+              class="recent-handle" link type="primary" size="small"
+              @click="openHandle(w)"
+            >去处理</el-button>
+            <span v-else class="recent-status">已处理</span>
           </div>
         </div>
         <el-empty v-else description="暂无预警记录" :image-size="90" />
       </div>
     </section>
+
+    <!-- 一键处理：复用预警处理页的同款弹窗 -->
+    <WarnHandleDialog v-model="handleDialogVisible" :warn="handlingWarn" @handled="loadData" />
   </div>
 </template>
 
@@ -264,15 +324,30 @@ function fmtTime(t?: string) {
 .stat-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  margin-bottom: 16px;
+  gap: var(--mg-sp-4);
+  margin-bottom: var(--mg-sp-4);
 }
 .stat-card {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 20px;
+  gap: var(--mg-sp-4);
+  padding: var(--mg-sp-5);
+  overflow: hidden;
 }
+/* 顶部语气细线：读作监护读数条 */
+.stat-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: var(--mg-accent-line, var(--mg-primary));
+  opacity: .85;
+}
+.stat-card.tone-card-teal  { --mg-accent-line: var(--mg-tone-teal-fg); }
+.stat-card.tone-card-amber { --mg-accent-line: var(--mg-tone-amber-fg); }
+.stat-card.tone-card-red   { --mg-accent-line: var(--mg-tone-red-fg); }
+.stat-card.tone-card-green { --mg-accent-line: var(--mg-tone-green-fg); }
 .stat-icon {
   display: grid;
   place-items: center;
@@ -282,67 +357,71 @@ function fmtTime(t?: string) {
   font-size: 25px;
   flex-shrink: 0;
 }
-.tone-teal  { background: #E4F4F4; color: #0FA3A3; }
-.tone-amber { background: #FCF0DC; color: #E6A23C; }
-.tone-red   { background: #FBE3E4; color: #E5484D; }
-.tone-green { background: #E1F3E8; color: #16A34A; }
+.tone-teal  { background: var(--mg-tone-teal-bg);  color: var(--mg-tone-teal-fg); }
+.tone-amber { background: var(--mg-tone-amber-bg); color: var(--mg-tone-amber-fg); }
+.tone-red   { background: var(--mg-tone-red-bg);   color: var(--mg-tone-red-fg); }
+.tone-green { background: var(--mg-tone-green-bg); color: var(--mg-tone-green-fg); }
 .stat-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.stat-label { font-size: 13px; color: var(--mg-muted); }
+.stat-label { font-size: var(--mg-fs-sm); color: var(--mg-muted); }
 .stat-value {
-  font-size: 30px;
+  font-size: var(--mg-fs-display);
   font-weight: 700;
   color: var(--mg-ink);
   line-height: 1.1;
   font-variant-numeric: tabular-nums;
 }
-.stat-value i { font-size: 14px; font-weight: 500; color: var(--mg-muted); margin-left: 3px; font-style: normal; }
-.stat-hint { font-size: 12px; color: var(--mg-muted); }
+.stat-value i { font-size: var(--mg-fs-body); font-weight: 500; color: var(--mg-muted); margin-left: 3px; font-style: normal; }
+.stat-hint { font-size: var(--mg-fs-caption); color: var(--mg-muted); }
 
 /* 图表面板 */
 .chart-grid {
   display: grid;
   grid-template-columns: 1.6fr 1fr;
-  gap: 16px;
+  gap: var(--mg-sp-4);
 }
-.panel { padding: 18px 20px; }
+.panel { padding: var(--mg-sp-5) var(--mg-sp-5); }
 .panel-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 8px;
+  margin-bottom: var(--mg-sp-2);
 }
 .panel-head h3 {
   display: flex;
   align-items: center;
   gap: 7px;
   margin: 0;
-  font-size: 15px;
+  font-size: var(--mg-fs-md);
   font-weight: 600;
   color: var(--mg-ink);
 }
 .panel-head h3 .el-icon { color: var(--mg-primary); }
-.panel-sub { font-size: 12px; color: var(--mg-muted); }
+.panel-sub { font-size: var(--mg-fs-caption); color: var(--mg-muted); }
 
 /* 最近预警列表 */
 .recent-list { display: flex; flex-direction: column; }
 .recent-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 11px 4px;
+  gap: var(--mg-sp-3);
+  padding: 11px var(--mg-sp-2);
+  margin: 0 calc(var(--mg-sp-2) * -1);
+  border-radius: var(--mg-radius-sm);
   border-bottom: 1px solid var(--mg-border);
+  transition: background-color var(--mg-dur-fast) var(--mg-ease);
 }
+.recent-item:hover { background: var(--mg-surface-2); }
 .recent-item:last-child { border-bottom: none; }
 .recent-main { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
 .recent-title {
-  font-size: 13px;
+  font-size: var(--mg-fs-sm);
   color: var(--mg-ink);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.recent-meta { font-size: 12px; color: var(--mg-muted); }
-.recent-status { font-size: 12px; color: var(--mg-muted); flex-shrink: 0; }
+.recent-meta { font-size: var(--mg-fs-caption); color: var(--mg-muted); }
+.recent-status { font-size: var(--mg-fs-caption); color: var(--mg-muted); flex-shrink: 0; }
 .recent-status.is-pending { color: var(--mg-warning); font-weight: 600; }
 
 @media (max-width: 1080px) {

@@ -27,6 +27,25 @@
 
     <div class="spacer" />
 
+    <!-- 主题切换 -->
+    <el-dropdown trigger="click" @command="onThemeCommand" class="theme-dropdown">
+      <button class="theme-toggle" type="button" :title="'主题：' + themeLabel">
+        <el-icon><component :is="themeIcon" /></el-icon>
+      </button>
+      <template #dropdown>
+        <el-dropdown-menu>
+          <el-dropdown-item
+            v-for="opt in themeOptions" :key="opt.value"
+            :command="opt.value"
+            :class="{ 'is-active-theme': themeStore.mode === opt.value }"
+          >
+            <el-icon class="theme-item-icon"><component :is="opt.icon" /></el-icon>
+            {{ opt.label }}
+          </el-dropdown-item>
+        </el-dropdown-menu>
+      </template>
+    </el-dropdown>
+
     <!-- 用户区 -->
     <el-dropdown trigger="click" @command="onCommand">
       <div class="user-chip">
@@ -101,12 +120,36 @@ import {
   Lock,
   SwitchButton,
   User as UserIcon,
+  Sunny,
+  Moon,
+  Monitor,
 } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/users'
+import { useThemeStore, type ThemeMode } from '@/stores/theme'
 import { changePassword, logout } from '@/api/user'
 
 const router = useRouter()
 const userStore = useUserStore()
+const themeStore = useThemeStore()
+
+const themeOptions = [
+  { value: 'light' as ThemeMode, label: '浅色', icon: Sunny },
+  { value: 'dark' as ThemeMode, label: '深色', icon: Moon },
+  { value: 'system' as ThemeMode, label: '跟随系统', icon: Monitor },
+]
+
+const themeLabel = computed(
+  () => themeOptions.find(o => o.value === themeStore.mode)?.label || '浅色',
+)
+// 按钮图标反映实际生效的主题（system 解析为日/月）
+const themeIcon = computed(() => {
+  if (themeStore.mode === 'system') return Monitor
+  return themeStore.resolved === 'dark' ? Moon : Sunny
+})
+
+function onThemeCommand(mode: ThemeMode) {
+  themeStore.setMode(mode)
+}
 
 const userName = computed(() => {
   return userStore.userInfo?.realName || userStore.userInfo?.username || '用户'
@@ -268,6 +311,35 @@ async function handleLogout() {
 }
 
 .spacer { flex: 1; }
+
+/* 主题切换按钮 */
+.theme-dropdown { margin-right: 6px; }
+.theme-toggle {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--mg-text);
+  font-size: 18px;
+  cursor: pointer;
+  outline: none;
+  transition: background-color var(--mg-dur-fast) var(--mg-ease),
+    color var(--mg-dur-fast) var(--mg-ease);
+}
+.theme-toggle:hover {
+  background: var(--mg-surface-2);
+  color: var(--mg-primary);
+}
+.theme-item-icon { margin-right: 8px; vertical-align: -2px; }
+.is-active-theme {
+  color: var(--mg-primary);
+  font-weight: 600;
+  background: var(--mg-primary-soft);
+}
 
 .user-chip {
   display: flex;
