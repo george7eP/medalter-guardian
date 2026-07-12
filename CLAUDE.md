@@ -83,6 +83,7 @@ medalter-guardian/
 | 角色鉴权补漏 | ✅ 完成 | 复查发现 `SysRoleController` 4 端点缺失 @PreAuthorize（提权隐患），已补 `system:role` |
 | 安全测试脚手架 | ✅ 基本完成 | JwtUtil + UserDetailsService 单测、9 个 Controller 方法级鉴权切片、登录流程端到端切片（68 测试全绿）；仅余 DB 集成测试待补 |
 | 包名重构 | ✅ 完成 | `com.isoft.yidajava` → `com.isoft.medalterguardian` 全量安全重命名（源码/测试/pom/yaml/文档），clean build 68 绿 |
+| 主题与体验精修 | ✅ 完成 | 三态主题（浅色/深色/跟随系统）+ 枚举统一 + 共享处理弹窗 + 侧栏路由同步 + 仪表盘签名体征带（PR #7，17 文件 +803/−213，已合入 master） |
 
 ---
 
@@ -102,6 +103,7 @@ medalter-guardian/
 | T10 | 前端繁体中文统一转简体（OpenCC t2s，19 文件 948 字符）+ `lang="zh-CN"` + 简体字体栈 | 🟡 中 | ✅ | — |
 | T11 | 前端 UI 视觉优化/重构（清新医疗蓝绿主题、外壳/登录重构、数据仪表盘+ECharts、动效、页面头/空状态） | 🟡 中 | ✅ | T10 |
 | T12 | README.md 繁体转简体（OpenCC 字符级 + 两岸词汇手工修正 621 字符） | 🟢 低 | ✅ | T10 |
+| T13 | 前端主题系统与体验精修：三态主题（浅色/深色/跟随系统，CSS 令牌 + EP 暗色 css-vars + FOUC 预防）、`constants/enums.ts` 统一 6 类枚举、共享 `WarnHandleDialog` + 仪表盘一键去处理、侧栏高亮跟随路由、字号/间距令牌、`HeroVitals` 监护仪式体征带（ECG 脉搏）（PR #7） | 🟡 中 | ✅ | T11 |
 
 ---
 
