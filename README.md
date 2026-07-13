@@ -105,11 +105,11 @@ src/main/java/com/isoft/medalterguardian/
 ├── aspect/         # LogAspect AOP 环绕切面
 ├── common/         # Result 统一响应、LoginRequest/Response
 ├── config/         # SecurityConfig、JwtAuthFilter、MybatisPlusConfig、MyMetaObjectHandler
-├── controller/     # REST 控制器（10 个）
+├── controller/     # REST 控制器（10 个，全部 @PreAuthorize 鉴权）
 ├── dao/            # MyBatis-Plus Mapper（10 个，零 XML 配置）
 ├── entity/         # 数据库实体映射（11 个，含 RBAC 五表 + 业务五表 + SysLog）
 ├── service/        # 业务接口（9 个）
-├── service/impl/   # 业务实现（10 个，含 UserDetailsServiceImpl）
+├── service/impl/   # 业务实现（10 个，含 UserDetailsServiceImpl + @Scheduled 日志清理）
 └── util/           # JwtUtil、PasswordGenerator
 ```
 
@@ -123,11 +123,18 @@ frontend/src/
 │   ├── system/           # log.ts + role.ts
 │   ├── user/index.ts     # 登录 + 用户 CRUD + 角色分配
 │   └── warn/             # handle.ts + rule.ts
-├── components/layout/    # top.vue（顶栏）+ leftside.vue（动态菜单）
+├── components/
+│   ├── charts/BaseChart.vue       # ECharts 主题感知封装
+│   ├── common/PageHeader.vue      # 统一页面标题栏
+│   ├── dashboard/HeroVitals.vue   # 监护仪式体征带（ECG 脉搏动画）
+│   ├── layout/                    # top.vue（顶栏）+ leftside.vue（动态菜单）
+│   └── warn/WarnHandleDialog.vue  # 预警处理共享弹窗
+├── constants/enums.ts    # 6 类枚举统一映射（设备状态/预警级别/处理状态/计划状态/检修结果/用户状态）
 ├── router/index.ts       # 路由定义 + beforeEach 权限守卫
-├── stores/users.ts       # Pinia 用户状态（token / permissions / userInfo）
+├── stores/               # Pinia 状态管理（users: token/权限/用户信息, theme: 三态主题）
 ├── util/request.ts       # Axios 封装（JWT 拦截器 + 统一错误处理）
 └── views/                # 页面视图（按业务模块分目录）
+    ├── dashboard/index.vue  # 数据概览仪表盘（ECharts 趋势/分布图表 + 最近预警）
     ├── device/index.vue
     ├── inspect/{plan,record}.vue
     ├── system/{log,role}.vue
@@ -235,6 +242,10 @@ ORDER BY p.sort ASC
 
 登录登出、用户 CRUD、密码修改、角色分配、设备 CRUD、检修计划/记录、预警规则/处理 — 覆盖全部写操作。
 
+### 日志自动清理
+
+`SysLogServiceImpl.cleanExpiredLogs()` 通过 `@Scheduled(cron = "0 0 3 * * *")` 每日凌晨 3 点自动删除 30 天前的操作日志，防止日志表无限膨胀。
+
 ---
 
 ## 🔗 API 路由一览
@@ -253,6 +264,8 @@ ORDER BY p.sort ASC
 | GET/POST/PUT/DELETE | `/warn/rule/**` | 预警规则 | 需认证 |
 | GET/PUT/DELETE | `/warn/info/**` | 预警处理 | 需认证 |
 | GET | `/system/log/**` | 操作日志 | 需认证 |
+
+> 以上列表 GET 端点均支持 `sortField` + `sortOrder` 参数动态排序。`/warn/info` 的 `warnLevel` 排序使用 MySQL `FIELD()` 按紧急程度自定义排序。
 
 ---
 
@@ -297,6 +310,9 @@ npm run dev
 - 前后端分离架构，代码完全解耦，便于迭代维护与团队协作。
 - RBAC 精细化权限管控，前端路由 + 后端 API 双重防护，适配多角色运维场景。
 - JWT 无状态认证 + BCrypt 密码单向加密，双重保障系统安全。
-- AOP 自动日志审计，双路兜底获取操作人（含登录操作），实现全流程可追溯。
+- **数据概览仪表盘**：ECharts 可视化（预警趋势 / 设备状态分布 / 预警级别分布），趋势图融合 warn_info + inspect_record 双数据源，主题自适应（浅色/深色/跟随系统）。
+- **动态列表排序**：设备管理、检修计划、检修记录、预警处理 4 页面均支持多维度动态排序（日期/级别/ID），预警级别使用 MySQL FIELD() 自定义排序。
+- AOP 自动日志审计，双路兜底获取操作人（含登录操作），实现全流程可追溯；配合每日凌晨自动清理 30 天前日志，防止数据膨胀。
 - MyBatis-Plus 零 XML 配置，仅一条手写 SQL（三表 JOIN 权限查询），代码极简。
 - 设备检修 + 故障预警双向管控，面向医疗设备运维的完整业务闭环。
+- 三态主题系统：CSS 自定义属性 + Element Plus 暗色变量覆盖 + FOUC 预防脚本，一键切换浅色/深色/跟随系统。

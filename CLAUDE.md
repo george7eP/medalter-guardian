@@ -84,6 +84,8 @@ medalter-guardian/
 | 安全测试脚手架 | ✅ 基本完成 | JwtUtil + UserDetailsService 单测、9 个 Controller 方法级鉴权切片、登录流程端到端切片（68 测试全绿）；仅余 DB 集成测试待补 |
 | 包名重构 | ✅ 完成 | `com.isoft.yidajava` → `com.isoft.medalterguardian` 全量安全重命名（源码/测试/pom/yaml/文档），clean build 68 绿 |
 | 主题与体验精修 | ✅ 完成 | 三态主题（浅色/深色/跟随系统）+ 枚举统一 + 共享处理弹窗 + 侧栏路由同步 + 仪表盘签名体征带（PR #7，17 文件 +803/−213，已合入 master） |
+| 测试数据生成 | ✅ 完成 | 5 张业务表测试数据：device_info 25/inspect_plan 8/inspect_record 80/warn_info 5/warn_rule 27，含真实医院设备/检修规则，时间约束 2025.1.1–2026.7.1（分支 `feat/test-data-generation`，SQL 脚本位于 `backend/database/test-data.sql`） |
+| 列表排序与体验优化 | ✅ 完成 | 4 页面动态排序（设备/计划/记录/预警，各 2–4 选项）；预警趋势图检修记录数据融合（warn_info + inspect_record 月度合并）；操作日志 30 天自动清理（`@Scheduled` 每日 3am） |
 
 ---
 
@@ -104,12 +106,35 @@ medalter-guardian/
 | T11 | 前端 UI 视觉优化/重构（清新医疗蓝绿主题、外壳/登录重构、数据仪表盘+ECharts、动效、页面头/空状态） | 🟡 中 | ✅ | T10 |
 | T12 | README.md 繁体转简体（OpenCC 字符级 + 两岸词汇手工修正 621 字符） | 🟢 低 | ✅ | T10 |
 | T13 | 前端主题系统与体验精修：三态主题（浅色/深色/跟随系统，CSS 令牌 + EP 暗色 css-vars + FOUC 预防）、`constants/enums.ts` 统一 6 类枚举、共享 `WarnHandleDialog` + 仪表盘一键去处理、侧栏高亮跟随路由、字号/间距令牌、`HeroVitals` 监护仪式体征带（ECG 脉搏）（PR #7） | 🟡 中 | ✅ | T11 |
+| T14 | 生成 5 张业务表测试数据（device_info 25/inspect_plan 8/inspect_record 80/warn_info 5/warn_rule 27），真实医院设备 + 检修规则 + 时间约束，脚本 `backend/database/test-data.sql` | 🟡 中 | ✅ | — |
+| T15 | 4 页面动态排序切换（设备/计划/记录/预警），后端 `sortField`/`sortOrder` 参数 + 前端排序下拉框，warnLevel 用 MySQL FIELD() 按严重程度排序 | 🟡 中 | ✅ | T14 |
+| T16 | 仪表盘预警趋势图数据修复：融合 warn_info + inspect_record（FAIL/PARTIAL/PASS）按月聚合，修复此前仅 6 月有数据的缺陷 | 🟡 中 | ✅ | T14 |
+| T17 | 操作日志自动清理：`@EnableScheduling` + `@Scheduled(cron "0 0 3 * * *")` 每日删除 30 天前 sys_log 记录 | 🟢 低 | ✅ | — |
 
 ---
 
 ## 已知问题
 
-- **DB 集成测试待补**：当前 68 测试均为纯 Mockito / `@WebMvcTest` 切片，无需数据库。仅在确定 MySQL / Testcontainers / H2 基建方案后，才有必要补 `@SpringBootTest` 集成测试。T1–T6、T8、T9 全部完成。
+- **DB 集成测试待补**：当前 68 测试均为纯 Mockito / `@WebMvcTest` 切片，无需数据库。仅在确定 MySQL / Testcontainers / H2 基建方案后，才有必要补 `@SpringBootTest` 集成测试。T1–T6、T8、T9、T15–T17 全部完成。
+
+---
+
+## 列表排序系统
+
+4 个业务列表页均支持前端排序下拉切换，后端统一接收 `sortField` + `sortOrder` 参数动态构建 `LambdaQueryWrapper` 排序。
+
+| 页面 | 默认排序 | 可选排序 | Controller 特殊处理 |
+|------|---------|---------|-------------------|
+| 设备管理 `/device` | ID ↑ | 上次检修 ↓/↑ | — |
+| 检修计划 `/inspect/plan` | 计划日期 ↓ (近→远) | 计划日期 ↑, ID ↑ | — |
+| 检修记录 `/inspect/record` | 检修日期 ↓ (近→远) | 检修日期 ↑, ID ↑ | — |
+| 预警处理 `/warn/info` | 预警级别 ↓ (紧急→低) | 级别 ↑, 预警时间 ↓/↑ | `FIELD(warn_level, 'LOW','MEDIUM','HIGH','URGENT')` 自定义排序 |
+
+前端统一模式：`sortField` ref 值带 `-asc` 后缀表示升序，API 调用时拆分为 `{ sortField, sortOrder }`。
+
+### 日志自动清理
+
+`SysLogServiceImpl.cleanExpiredLogs()` — 每日凌晨 3:00 执行，`DELETE FROM sys_log WHERE create_time < NOW() - INTERVAL 30 DAY`。
 
 ---
 

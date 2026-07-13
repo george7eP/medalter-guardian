@@ -28,7 +28,9 @@ public class WarnInfoController {
             @RequestParam(value = "pageSize", defaultValue = "10") int pageSize,
             @RequestParam(required = false) Long deviceId,
             @RequestParam(required = false) String warnLevel,
-            @RequestParam(required = false) String handleStatus) {
+            @RequestParam(required = false) String handleStatus,
+            @RequestParam(required = false, defaultValue = "warnLevel") String sortField,
+            @RequestParam(required = false, defaultValue = "desc") String sortOrder) {
 
         Page<WarnInfo> pageParam = new Page<>(page, pageSize);
         LambdaQueryWrapper<WarnInfo> queryWrapper = new LambdaQueryWrapper<>();
@@ -43,10 +45,27 @@ public class WarnInfoController {
             queryWrapper.eq(WarnInfo::getHandleStatus, handleStatus);
         }
 
-        // 依據預警時間倒序排序（最新的警報在最前面）
-        queryWrapper.orderByDesc(WarnInfo::getWarnTime);
+        applySort(queryWrapper, sortField, sortOrder);
         Page<WarnInfo> warnPage = warnInfoService.page(pageParam, queryWrapper);
         return Result.success(warnPage);
+    }
+
+    private void applySort(LambdaQueryWrapper<WarnInfo> qw, String sortField, String sortOrder) {
+        boolean asc = "asc".equalsIgnoreCase(sortOrder);
+        switch (sortField) {
+            case "warnTime":
+                if (asc) qw.orderByAsc(WarnInfo::getWarnTime);
+                else qw.orderByDesc(WarnInfo::getWarnTime);
+                break;
+            case "id":
+                if (asc) qw.orderByAsc(WarnInfo::getId);
+                else qw.orderByDesc(WarnInfo::getId);
+                break;
+            default: // warnLevel — 用 MySQL FIELD() 按嚴重程度排序
+                String dir = asc ? "ASC" : "DESC";
+                qw.last("ORDER BY FIELD(warn_level, 'LOW','MEDIUM','HIGH','URGENT') " + dir);
+                break;
+        }
     }
 
     /**

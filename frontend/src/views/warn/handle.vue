@@ -31,6 +31,18 @@
     </el-card>
 
     <el-card class="table-card" shadow="never">
+      <div class="toolbar">
+        <span></span>
+        <div class="toolbar-right">
+          <span class="sort-label">排序</span>
+          <el-select v-model="sortField" @change="handleSearch" style="width: 190px">
+            <el-option label="预警级别 ↓ 紧急→低" value="warnLevel" />
+            <el-option label="预警级别 ↑ 低→紧急" value="warnLevel-asc" />
+            <el-option label="预警时间 ↓ 近→远" value="warnTime" />
+            <el-option label="预警时间 ↑ 远→近" value="warnTime-asc" />
+          </el-select>
+        </div>
+      </div>
       <el-table :data="tableData" style="width: 100%" v-loading="loading" border stripe>
         <el-table-column prop="id" label="ID" width="70" align="center" />
         <el-table-column label="关联设备" min-width="140">
@@ -100,9 +112,10 @@
 </template>
 
 <script setup lang="ts">
+import { ref, reactive, onMounted } from "vue"
+import { useRoute } from "vue-router"
 import PageHeader from '@/components/common/PageHeader.vue'
 import WarnHandleDialog from '@/components/warn/WarnHandleDialog.vue'
-import { ref, reactive, onMounted } from "vue"
 import { getWarnList } from "@/api/warn/handle"
 import type { WarnInfo } from "@/api/warn/handle"
 import { getDeviceList } from "@/api/device"
@@ -120,6 +133,9 @@ const currentWarn = ref<WarnInfo | null>(null)
 
 const searchForm = reactive({ deviceId: undefined as number | undefined, warnLevel: '', handleStatus: '' })
 const pageParams = reactive({ page: 1, pageSize: 10 })
+const sortField = ref('warnLevel')
+
+const route = useRoute()
 
 const fetchDeviceOptions = async () => {
   try {
@@ -143,7 +159,9 @@ const fetchWarnList = async () => {
       pageSize: pageParams.pageSize,
       deviceId: searchForm.deviceId,
       warnLevel: searchForm.warnLevel || undefined,
-      handleStatus: searchForm.handleStatus || undefined
+      handleStatus: searchForm.handleStatus || undefined,
+      sortField: sortField.value.replace('-asc', ''),
+      sortOrder: sortField.value.endsWith('-asc') ? 'asc' : 'desc'
     }
     const result: any = await getWarnList(params)
     tableData.value = result.records || result.list || []
@@ -166,7 +184,14 @@ const openHandleDialog = (row: WarnInfo, viewOnly = false) => {
 
 onMounted(() => {
   fetchDeviceOptions().then(() => {
-    fetchWarnList()
+    fetchWarnList().then(() => {
+      // 从仪表盘跳转过来时自动打开对应预警的处理弹窗
+      const warnId = route.query.warnId
+      if (warnId) {
+        const target = tableData.value.find(w => w.id === Number(warnId))
+        if (target) openHandleDialog(target)
+      }
+    })
   })
 })
 </script>
@@ -175,5 +200,8 @@ onMounted(() => {
 .warn-handle-container { padding: 10px; }
 .search-card { margin-bottom: 15px; }
 .table-card { min-height: 500px; }
+.toolbar { margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+.toolbar-right { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+.sort-label { font-size: var(--mg-fs-sm); color: var(--mg-muted); }
 .pagination-container { margin-top: 20px; display: flex; justify-content: flex-end; }
 </style>

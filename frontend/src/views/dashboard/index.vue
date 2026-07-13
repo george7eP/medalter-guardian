@@ -7,9 +7,9 @@ import {
 import PageHeader from '@/components/common/PageHeader.vue'
 import HeroVitals from '@/components/dashboard/HeroVitals.vue'
 import BaseChart from '@/components/charts/BaseChart.vue'
-import WarnHandleDialog from '@/components/warn/WarnHandleDialog.vue'
 import { getDeviceList, type DeviceInfo } from '@/api/device'
 import { getWarnList, type WarnInfo } from '@/api/warn/handle'
+import { getRecordList, type InspectRecord } from '@/api/inspect/record'
 import { useThemeStore } from '@/stores/theme'
 import { WARN_LEVEL, enumTag, enumLabel } from '@/constants/enums'
 
@@ -43,6 +43,7 @@ const themedTooltip = computed(() => ({
 const loading = ref(false)
 const devices = ref<DeviceInfo[]>([])
 const warns = ref<WarnInfo[]>([])
+const records = ref<InspectRecord[]>([])
 
 const today = new Date().toLocaleDateString('zh-CN', {
   year: 'numeric', month: 'long', day: 'numeric', weekday: 'long',
@@ -50,14 +51,17 @@ const today = new Date().toLocaleDateString('zh-CN', {
 
 async function loadData() {
   loading.value = true
-  const [dRes, wRes] = await Promise.allSettled([
+  const [dRes, wRes, rRes] = await Promise.allSettled([
     getDeviceList({ page: 1, pageSize: 1000 }),
     getWarnList({ page: 1, pageSize: 1000 }),
+    getRecordList({ page: 1, pageSize: 10000 }),
   ])
   devices.value = dRes.status === 'fulfilled'
     ? (dRes.value.records || dRes.value.list || []) : []
   warns.value = wRes.status === 'fulfilled'
     ? (wRes.value.records || wRes.value.list || []) : []
+  records.value = rRes.status === 'fulfilled'
+    ? (rRes.value.records || rRes.value.list || []) : []
   loading.value = false
 }
 
@@ -98,7 +102,7 @@ const levelMeta: Record<string, { name: string; color: string }> = {
 }
 
 const trendOption = computed(() => {
-  // 近 6 个月预警数量趋势（按 warnTime 月份聚合）
+  // 近 6 个月预警趋势：合并 warn_info 预警记录 + 检修记录（FAIL/PARTIAL/PASS 均视为预警关联事件）
   const now = new Date()
   const buckets: { label: string; key: string }[] = []
   for (let i = 5; i >= 0; i--) {
@@ -108,16 +112,38 @@ const trendOption = computed(() => {
       key: `${d.getFullYear()}-${d.getMonth() + 1}`,
     })
   }
-  const counts = buckets.map(b => warns.value.filter(w => {
+
+  // 统计 warn_info 中的预警事件（按 warnTime 月份）
+  const warnCounts = buckets.map(b => warns.value.filter(w => {
     if (!w.warnTime) return false
     const t = new Date(w.warnTime)
     return `${t.getFullYear()}-${t.getMonth() + 1}` === b.key
   }).length)
 
+  // 统计检修记录（全部结果均视为预警关联事件，按 inspectDate 月份）
+  const recordCounts = buckets.map(b => records.value.filter(r => {
+    if (!r.inspectDate) return false
+    const t = new Date(r.inspectDate)
+    return `${t.getFullYear()}-${t.getMonth() + 1}` === b.key
+  }).length)
+
+  // 合并计数：warn_info + 检修记录（同一月份内的两类事件叠加）
+  const counts = buckets.map((_, i) => warnCounts[i] + recordCounts[i])
+
   const t = chartTokens.value
   return {
     grid: { top: 24, right: 18, bottom: 30, left: 40 },
-    tooltip: { trigger: 'axis', ...themedTooltip.value },
+    tooltip: {
+      trigger: 'axis',
+      formatter: (ps: any[]) => {
+        const idx = ps[0]?.dataIndex
+        return `<b>${buckets[idx]?.label}</b><br/>
+          预警事件：${warnCounts[idx]} 条<br/>
+          关联检修：${recordCounts[idx]} 条<br/>
+          合计：${counts[idx]} 条`
+      },
+      ...themedTooltip.value,
+    },
     xAxis: {
       type: 'category', data: buckets.map(b => b.label),
       boundaryGap: false,
@@ -217,12 +243,9 @@ function fmtTime(t?: string) {
   return t ? t.replace('T', ' ').slice(5, 16) : '—'
 }
 
-/* —— 一键处理 —— */
-const handleDialogVisible = ref(false)
-const handlingWarn = ref<WarnInfo | null>(null)
+/* —— 一键处理：跳转至预警处理页 —— */
 function openHandle(w: WarnInfo) {
-  handlingWarn.value = w
-  handleDialogVisible.value = true
+  router.push({ path: '/warn/handle', query: { warnId: w.id } })
 }
 </script>
 
@@ -290,7 +313,12 @@ function openHandle(w: WarnInfo) {
           <el-button link type="primary" @click="router.push('/warn/handle')">查看全部</el-button>
         </div>
         <div v-if="recentWarns.length" class="recent-list">
-          <div v-for="w in recentWarns" :key="w.id" class="recent-item">
+          <div
+            v-for="w in recentWarns" :key="w.id"
+            class="recent-item"
+            :class="{ 'is-clickable': w.handleStatus === 'UNHANDLED' }"
+            @click="w.handleStatus === 'UNHANDLED' && openHandle(w)"
+          >
             <el-tag :type="enumTag(WARN_LEVEL, w.warnLevel)" size="small" effect="light" round>
               {{ enumLabel(WARN_LEVEL, w.warnLevel) }}
             </el-tag>
@@ -298,27 +326,22 @@ function openHandle(w: WarnInfo) {
               <span class="recent-title">{{ w.warnContent }}</span>
               <span class="recent-meta">
                 {{ deviceNameMap[w.deviceId] || '设备#' + w.deviceId }} · {{ fmtTime(w.warnTime) }}
+                <span class="recent-status-tag" :class="w.handleStatus === 'UNHANDLED' ? 'is-pending' : 'is-done'">
+                  {{ w.handleStatus === 'UNHANDLED' ? '未处理' : '已处理' }}
+                </span>
               </span>
             </div>
-            <el-button
-              v-if="w.handleStatus === 'UNHANDLED'"
-              class="recent-handle" link type="primary" size="small"
-              @click="openHandle(w)"
-            >去处理</el-button>
-            <span v-else class="recent-status">已处理</span>
           </div>
         </div>
         <el-empty v-else description="暂无预警记录" :image-size="90" />
       </div>
     </section>
 
-    <!-- 一键处理：复用预警处理页的同款弹窗 -->
-    <WarnHandleDialog v-model="handleDialogVisible" :warn="handlingWarn" @handled="loadData" />
   </div>
 </template>
 
 <style scoped>
-.dashboard { max-width: 1320px; }
+.dashboard { width: 100%; }
 
 /* 指标卡 */
 .stat-grid {
@@ -376,10 +399,10 @@ function openHandle(w: WarnInfo) {
 /* 图表面板 */
 .chart-grid {
   display: grid;
-  grid-template-columns: 1.6fr 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: var(--mg-sp-4);
 }
-.panel { padding: var(--mg-sp-5) var(--mg-sp-5); }
+.panel { padding: var(--mg-sp-5) var(--mg-sp-5); overflow: hidden; }
 .panel-head {
   display: flex;
   align-items: center;
@@ -411,6 +434,8 @@ function openHandle(w: WarnInfo) {
   transition: background-color var(--mg-dur-fast) var(--mg-ease);
 }
 .recent-item:hover { background: var(--mg-surface-2); }
+.recent-item.is-clickable { cursor: pointer; }
+.recent-item.is-clickable:hover { background: var(--mg-primary-light, rgba(15,163,163,.08)); }
 .recent-item:last-child { border-bottom: none; }
 .recent-main { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
 .recent-title {
@@ -420,9 +445,14 @@ function openHandle(w: WarnInfo) {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.recent-meta { font-size: var(--mg-fs-caption); color: var(--mg-muted); }
-.recent-status { font-size: var(--mg-fs-caption); color: var(--mg-muted); flex-shrink: 0; }
-.recent-status.is-pending { color: var(--mg-warning); font-weight: 600; }
+.recent-meta { font-size: var(--mg-fs-caption); color: var(--mg-muted); white-space: nowrap; }
+.recent-status-tag {
+  margin-left: 6px;
+  font-size: var(--mg-fs-caption);
+  font-weight: 500;
+}
+.recent-status-tag.is-pending { color: var(--mg-warning, #E6A23C); }
+.recent-status-tag.is-done    { color: var(--mg-muted); }
 
 @media (max-width: 1080px) {
   .stat-grid { grid-template-columns: repeat(2, 1fr); }

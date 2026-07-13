@@ -26,7 +26,9 @@ public class InspectRecordController {
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "pageSize", defaultValue = "10") int pageSize,
             @RequestParam(required = false) Long deviceId,
-            @RequestParam(required = false) String inspectResult) {
+            @RequestParam(required = false) String inspectResult,
+            @RequestParam(required = false, defaultValue = "inspectDate") String sortField,
+            @RequestParam(required = false, defaultValue = "desc") String sortOrder) {
 
         Page<InspectRecord> pageParam = new Page<>(page, pageSize);
         LambdaQueryWrapper<InspectRecord> queryWrapper = new LambdaQueryWrapper<>();
@@ -39,9 +41,23 @@ public class InspectRecordController {
             queryWrapper.eq(InspectRecord::getInspectResult, inspectResult);
         }
 
-        queryWrapper.orderByDesc(InspectRecord::getInspectDate);
+        applySort(queryWrapper, sortField, sortOrder);
         Page<InspectRecord> recordPage = inspectRecordService.page(pageParam, queryWrapper);
         return Result.success(recordPage);
+    }
+
+    private void applySort(LambdaQueryWrapper<InspectRecord> qw, String sortField, String sortOrder) {
+        boolean asc = "asc".equalsIgnoreCase(sortOrder);
+        switch (sortField) {
+            case "id":
+                if (asc) qw.orderByAsc(InspectRecord::getId);
+                else qw.orderByDesc(InspectRecord::getId);
+                break;
+            default: // inspectDate
+                if (asc) qw.orderByAsc(InspectRecord::getInspectDate);
+                else qw.orderByDesc(InspectRecord::getInspectDate);
+                break;
+        }
     }
 
     /**

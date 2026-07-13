@@ -42,7 +42,7 @@ public class WarnRuleController {
             queryWrapper.eq(WarnRule::getRuleStatus, ruleStatus);
         }
 
-        queryWrapper.orderByDesc(WarnRule::getCreateTime);
+        queryWrapper.orderByAsc(WarnRule::getId);
         Page<WarnRule> rulePage = warnRuleService.page(pageParam, queryWrapper);
         return Result.success(rulePage);
     }

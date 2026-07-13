@@ -105,11 +105,11 @@ src/main/java/com/isoft/medalterguardian/
 ├── aspect/         # LogAspect around-advice aspect
 ├── common/         # Result unified response, LoginRequest/Response DTOs
 ├── config/         # SecurityConfig, JwtAuthFilter, MybatisPlusConfig, MyMetaObjectHandler
-├── controller/     # REST controllers (10)
+├── controller/     # REST controllers (10, all @PreAuthorize secured)
 ├── dao/            # MyBatis-Plus mappers (10, zero XML)
 ├── entity/         # Database entity mappings (11: RBAC 5 + business 5 + SysLog)
 ├── service/        # Business interfaces (9)
-├── service/impl/   # Business implementations (10, including UserDetailsServiceImpl)
+├── service/impl/   # Business implementations (10, including UserDetailsServiceImpl + @Scheduled log cleanup)
 └── util/           # JwtUtil, PasswordGenerator
 ```
 
@@ -123,11 +123,18 @@ frontend/src/
 │   ├── system/           # log.ts + role.ts
 │   ├── user/index.ts     # Login + user CRUD + role assignment
 │   └── warn/             # handle.ts + rule.ts
-├── components/layout/    # top.vue (header) + leftside.vue (dynamic menu)
+├── components/
+│   ├── charts/BaseChart.vue       # ECharts theme-aware wrapper
+│   ├── common/PageHeader.vue      # Unified page header
+│   ├── dashboard/HeroVitals.vue   # Hero vitals bar (ECG pulse animation)
+│   ├── layout/                    # top.vue (header) + leftside.vue (dynamic menu)
+│   └── warn/WarnHandleDialog.vue  # Shared warning handling dialog
+├── constants/enums.ts    # 6 unified enum maps (device status/warn level/handle status/plan status/inspect result/user status)
 ├── router/index.ts       # Route definitions + beforeEach permission guard
-├── stores/users.ts       # Pinia user store (token / permissions / userInfo)
+├── stores/               # Pinia stores (users: token/permissions/userInfo, theme: tri-state theme)
 ├── util/request.ts       # Axios wrapper (JWT interceptor + unified error handling)
 └── views/                # Page views (by business module)
+    ├── dashboard/index.vue  # Data dashboard (ECharts trends/distribution + recent warnings)
     ├── device/index.vue
     ├── inspect/{plan,record}.vue
     ├── system/{log,role}.vue
@@ -235,6 +242,10 @@ ORDER BY p.sort ASC
 
 Login/logout, user CRUD, password changes, role assignments, device CRUD, maintenance plans/records, warning rules/handling — covering all write operations.
 
+### Log Auto-Cleanup
+
+`SysLogServiceImpl.cleanExpiredLogs()` runs daily at 3:00 AM via `@Scheduled(cron = "0 0 3 * * *")`, automatically deleting sys_log entries older than 30 days to prevent unbounded table growth.
+
 ---
 
 ## 🔗 API Endpoints
@@ -253,6 +264,8 @@ Login/logout, user CRUD, password changes, role assignments, device CRUD, mainte
 | GET/POST/PUT/DELETE | `/warn/rule/**` | Warning rules | Authenticated |
 | GET/PUT/DELETE | `/warn/info/**` | Warning handling | Authenticated |
 | GET | `/system/log/**` | Operation logs | Authenticated |
+
+> All GET endpoints above support `sortField` + `sortOrder` query parameters for dynamic sorting. `/warn/info` uses MySQL `FIELD()` for custom severity-ordered sorting on `warnLevel`.
 
 ---
 
@@ -297,6 +310,9 @@ npm run dev
 - Fully decoupled frontend-backend architecture enabling independent iteration and team collaboration.
 - RBAC fine-grained authorization with dual frontend route + backend API protection, adaptable to multi-role O&M scenarios.
 - Dual security: JWT stateless authentication + BCrypt one-way password encryption.
-- AOP-powered automatic audit logging with dual-fallback operator resolution (including login operations), delivering end-to-end traceability.
+- **Data Dashboard**: ECharts visualization (warning trend / device status distribution / warning level distribution). Trend chart merges warn_info + inspect_record dual data sources, with light/dark/auto theme support.
+- **Dynamic List Sorting**: Device management, maintenance plans, maintenance records, and warning handling pages all support multi-dimension sorting (date/level/ID). Warning severity uses MySQL FIELD() custom ordering.
+- AOP-powered automatic audit logging with dual-fallback operator resolution (including login operations), delivering end-to-end traceability. Daily 3 AM auto-cleanup of logs older than 30 days prevents data bloat.
 - MyBatis-Plus with zero XML configuration — only a single hand-written SQL for the 3-table permission JOIN.
 - Complete closed-loop medical device O&M covering both planned maintenance and fault early warning.
+- Tri-state theme system: CSS custom properties + Element Plus dark CSS variable overrides + FOUC prevention script. One-click light/dark/system toggle.

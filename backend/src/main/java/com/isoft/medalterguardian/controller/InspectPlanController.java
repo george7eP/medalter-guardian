@@ -26,7 +26,9 @@ public class InspectPlanController {
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "pageSize", defaultValue = "10") int pageSize,
             @RequestParam(required = false) Long deviceId,
-            @RequestParam(required = false) String planStatus) {
+            @RequestParam(required = false) String planStatus,
+            @RequestParam(required = false, defaultValue = "planDate") String sortField,
+            @RequestParam(required = false, defaultValue = "desc") String sortOrder) {
 
         Page<InspectPlan> pageParam = new Page<>(page, pageSize);
         LambdaQueryWrapper<InspectPlan> queryWrapper = new LambdaQueryWrapper<>();
@@ -38,9 +40,23 @@ public class InspectPlanController {
             queryWrapper.eq(InspectPlan::getPlanStatus, planStatus);
         }
 
-        queryWrapper.orderByDesc(InspectPlan::getPlanDate);
+        applySort(queryWrapper, sortField, sortOrder);
         Page<InspectPlan> planPage = inspectPlanService.page(pageParam, queryWrapper);
         return Result.success(planPage);
+    }
+
+    private void applySort(LambdaQueryWrapper<InspectPlan> qw, String sortField, String sortOrder) {
+        boolean asc = "asc".equalsIgnoreCase(sortOrder);
+        switch (sortField) {
+            case "id":
+                if (asc) qw.orderByAsc(InspectPlan::getId);
+                else qw.orderByDesc(InspectPlan::getId);
+                break;
+            default: // planDate
+                if (asc) qw.orderByAsc(InspectPlan::getPlanDate);
+                else qw.orderByDesc(InspectPlan::getPlanDate);
+                break;
+        }
     }
 
     /**
