@@ -9,6 +9,12 @@ Thumbs.db
 
 # Claude
 .claude/
+CLAUDE.md
 
 # Transient dev-server logs
 *-run.log
+
+# Scaffold & editor
+frontend/README.md
+frontend/src/stores/counter.ts
+frontend/.vscode/
