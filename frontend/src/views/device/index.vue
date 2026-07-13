@@ -23,6 +23,14 @@
     <el-card class="table-card" shadow="never">
       <div class="toolbar">
         <el-button type="primary" @click="handleAdd">新增设备</el-button>
+        <div class="toolbar-right">
+          <span class="sort-label">排序</span>
+          <el-select v-model="sortField" @change="handleSearch" style="width: 190px">
+            <el-option label="默认 (ID ↑)" value="id-asc" />
+            <el-option label="上次检修 ↓ 近→远" value="lastInspectDate" />
+            <el-option label="上次检修 ↑ 远→近" value="lastInspectDate-asc" />
+          </el-select>
+        </div>
       </div>
 
       <el-table :data="tableData" style="width: 100%" v-loading="loading" border stripe>
@@ -152,6 +160,7 @@ const isEdit = ref(false)
 
 const searchForm = reactive({ deviceName: '', deviceStatus: '' })
 const pageParams = reactive({ page: 1, pageSize: 10 })
+const sortField = ref('id-asc')
 
 const deviceForm = reactive<DeviceInfo>({
   id: undefined,
@@ -173,7 +182,9 @@ const fetchDeviceList = async () => {
       page: pageParams.page,
       pageSize: pageParams.pageSize,
       deviceName: searchForm.deviceName || undefined,
-      deviceStatus: searchForm.deviceStatus || undefined
+      deviceStatus: searchForm.deviceStatus || undefined,
+      sortField: sortField.value.replace('-asc', ''),
+      sortOrder: sortField.value.endsWith('-asc') ? 'asc' : 'desc'
     })
     tableData.value = result.records || result.list || []
     total.value = result.total || 0
@@ -244,6 +255,8 @@ onMounted(fetchDeviceList)
 .device-container { padding: 10px; }
 .search-card { margin-bottom: 15px; }
 .table-card { min-height: 500px; }
-.toolbar { margin-bottom: 15px; }
+.toolbar { margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+.toolbar-right { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+.sort-label { font-size: var(--mg-fs-sm); color: var(--mg-muted); }
 .pagination-container { margin-top: 20px; display: flex; justify-content: flex-end; }
 </style>

@@ -26,7 +26,9 @@ public class DeviceInfoController {
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "pageSize", defaultValue = "10") int pageSize,
             @RequestParam(required = false) String deviceName,
-            @RequestParam(required = false) String deviceStatus) {
+            @RequestParam(required = false) String deviceStatus,
+            @RequestParam(required = false, defaultValue = "id") String sortField,
+            @RequestParam(required = false, defaultValue = "asc") String sortOrder) {
 
         Page<DeviceInfo> pageParam = new Page<>(page, pageSize);
         LambdaQueryWrapper<DeviceInfo> queryWrapper = new LambdaQueryWrapper<>();
@@ -40,9 +42,23 @@ public class DeviceInfoController {
             queryWrapper.eq(DeviceInfo::getDeviceStatus, deviceStatus);
         }
 
-        queryWrapper.orderByDesc(DeviceInfo::getCreateTime);
+        applySort(queryWrapper, sortField, sortOrder);
         Page<DeviceInfo> devicePage = deviceInfoService.page(pageParam, queryWrapper);
         return Result.success(devicePage);
+    }
+
+    private void applySort(LambdaQueryWrapper<DeviceInfo> qw, String sortField, String sortOrder) {
+        boolean asc = "asc".equalsIgnoreCase(sortOrder);
+        switch (sortField) {
+            case "lastInspectDate":
+                if (asc) qw.orderByAsc(DeviceInfo::getLastInspectDate);
+                else qw.orderByDesc(DeviceInfo::getLastInspectDate);
+                break;
+            default: // id
+                if (asc) qw.orderByAsc(DeviceInfo::getId);
+                else qw.orderByDesc(DeviceInfo::getId);
+                break;
+        }
     }
 
     /**

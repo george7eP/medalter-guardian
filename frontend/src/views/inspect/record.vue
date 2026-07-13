@@ -25,6 +25,14 @@
     <el-card class="table-card" shadow="never">
       <div class="toolbar">
         <el-button type="primary" @click="handleAdd">新增检修记录</el-button>
+        <div class="toolbar-right">
+          <span class="sort-label">排序</span>
+          <el-select v-model="sortField" @change="handleSearch" style="width: 190px">
+            <el-option label="检修日期 ↓ 近→远" value="inspectDate" />
+            <el-option label="检修日期 ↑ 远→近" value="inspectDate-asc" />
+            <el-option label="ID ↑" value="id-asc" />
+          </el-select>
+        </div>
       </div>
 
       <el-table :data="tableData" style="width: 100%" v-loading="loading" border stripe>
@@ -140,6 +148,7 @@ const isEdit = ref(false)
 
 const searchForm = reactive({ deviceId: undefined as number | undefined, inspectResult: '' })
 const pageParams = reactive({ page: 1, pageSize: 10 })
+const sortField = ref('inspectDate')
 
 const recordForm = reactive<InspectRecord>({
   id: undefined,
@@ -174,7 +183,9 @@ const fetchRecordList = async () => {
       page: pageParams.page,
       pageSize: pageParams.pageSize,
       deviceId: searchForm.deviceId,
-      inspectResult: searchForm.inspectResult || undefined
+      inspectResult: searchForm.inspectResult || undefined,
+      sortField: sortField.value === 'inspectDate-asc' ? 'inspectDate' : sortField.value,
+      sortOrder: sortField.value === 'inspectDate-asc' ? 'asc' : 'desc'
     }
     const result: any = await getRecordList(params)
     tableData.value = result.records || result.list || []
@@ -249,6 +260,8 @@ onMounted(() => {
 .record-container { padding: 10px; }
 .search-card { margin-bottom: 15px; }
 .table-card { min-height: 500px; }
-.toolbar { margin-bottom: 15px; }
+.toolbar { margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+.toolbar-right { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+.sort-label { font-size: var(--mg-fs-sm); color: var(--mg-muted); }
 .pagination-container { margin-top: 20px; display: flex; justify-content: flex-end; }
 </style>
